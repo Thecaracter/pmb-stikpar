@@ -1,0 +1,40 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration {
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::create('registrations', function (Blueprint $table) {
+            $table->id();
+            $table->string('registration_number')->unique();
+            $table->foreignId('user_id')->constrained()->onDelete('cascade');
+            $table->foreignId('wave_id')->constrained('registration_waves')->onDelete('cascade');
+            $table->foreignId('path_id')->constrained('registration_paths')->onDelete('cascade');
+            $table->enum('status', ['pending', 'waiting_payment', 'waiting_documents', 'passed', 'failed'])->default('pending');
+            $table->decimal('admin_fee_paid', 10, 2)->nullable();
+            $table->timestamp('payment_date')->nullable();
+            $table->timestamp('document_submitted_at')->nullable();
+            $table->timestamp('passed_at')->nullable();
+            $table->text('failure_reason')->nullable();
+            $table->timestamps();
+
+            $table->index(['user_id', 'wave_id']); // Index untuk query berdasarkan user dan gelombang
+            $table->index('status'); // Index untuk filter berdasarkan status
+            $table->index('registration_number'); // Index untuk pencarian nomor registrasi
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::dropIfExists('registrations');
+    }
+};
