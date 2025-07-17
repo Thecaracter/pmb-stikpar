@@ -21,6 +21,12 @@ class RegistrationPathSeeder extends Seeder
                 'is_active' => true
             ],
             [
+                'name' => 'Prestasi',
+                'code' => 'PRE',
+                'description' => 'Jalur pendaftaran berdasarkan prestasi',
+                'is_active' => true
+            ],
+            [
                 'name' => 'Beasiswa KIP',
                 'code' => 'KIP',
                 'description' => 'Jalur pendaftaran beasiswa KIP',
@@ -35,7 +41,10 @@ class RegistrationPathSeeder extends Seeder
         ];
 
         foreach ($paths as $path) {
-            RegistrationPath::create($path);
+            RegistrationPath::updateOrCreate(
+                ['code' => $path['code']],
+                $path
+            );
         }
     }
 }

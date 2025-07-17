@@ -13,16 +13,52 @@ class RegistrationWave extends Model
         'end_date',
         'administration_fee',
         'registration_fee',
-        'is_active'
+        'is_active',
+        'available_paths'
     ];
 
     protected $casts = [
-        'start_date' => 'date',
-        'end_date' => 'date',
+        'start_date' => 'datetime',
+        'end_date' => 'datetime',
         'administration_fee' => 'decimal:2',
         'registration_fee' => 'decimal:2',
-        'is_active' => 'boolean'
+        'is_active' => 'boolean',
+        'available_paths' => 'json'
     ];
+
+    /**
+     * Get formatted start date for HTML date input
+     */
+    public function getStartDateFormatAttribute()
+    {
+        return $this->start_date ? $this->start_date->format('Y-m-d') : '';
+    }
+
+    /**
+     * Get formatted end date for HTML date input
+     */
+    public function getEndDateFormatAttribute()
+    {
+        return $this->end_date ? $this->end_date->format('Y-m-d') : '';
+    }
+
+    /**
+     * Override toArray to include formatted dates
+     */
+    public function toArray()
+    {
+        $array = parent::toArray();
+
+        // Format dates for HTML date inputs
+        if ($this->start_date) {
+            $array['start_date'] = $this->start_date->format('Y-m-d');
+        }
+        if ($this->end_date) {
+            $array['end_date'] = $this->end_date->format('Y-m-d');
+        }
+
+        return $array;
+    }
 
     /**
      * Get active waves
@@ -128,5 +164,54 @@ class RegistrationWave extends Model
         }
 
         return 'green';
+    }
+
+    /**
+     * Check if a registration path is available
+     */
+    public function isPathAvailable($path)
+    {
+        if (!$this->available_paths) {
+            return true; // Default: all paths available
+        }
+
+        return $this->available_paths[$path] ?? false;
+    }
+
+    /**
+     * Get available paths as array
+     */
+    public function getAvailablePathsArray()
+    {
+        if (!$this->available_paths) {
+            return [
+                'regular' => true,
+                'prestasi' => true,
+                'kip' => true,
+            ];
+        }
+
+        return $this->available_paths;
+    }
+
+    /**
+     * Get available paths labels
+     */
+    public function getAvailablePathsLabels()
+    {
+        $paths = $this->getAvailablePathsArray();
+        $labels = [];
+
+        if ($paths['regular']) {
+            $labels[] = 'Reguler';
+        }
+        if ($paths['prestasi']) {
+            $labels[] = 'Prestasi';
+        }
+        if ($paths['kip']) {
+            $labels[] = 'KIP';
+        }
+
+        return $labels;
     }
 }
