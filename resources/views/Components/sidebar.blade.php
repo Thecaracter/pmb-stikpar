@@ -73,7 +73,6 @@
                             </svg>
                         </div>
                     </a>
-                   
                 </div>
             </div>
 
@@ -86,68 +85,26 @@
                 </div>
                 
                 <div class="space-y-1">
-                    <a href="#" class="flex items-center px-4 py-3 text-sm font-medium text-gray-700 rounded-xl hover:bg-blue-50 hover:text-blue-700 transition-all duration-200 group">
-                        <div class="p-2 bg-blue-50 rounded-lg mr-3 group-hover:bg-blue-100 transition-colors">
-                            <svg class="h-5 w-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"></path>
-                            </svg>
-                        </div>
-                        <span>Data Pendaftar</span>
-                        <div class="ml-auto flex items-center space-x-2">
-                            <span class="bg-blue-100 text-blue-800 text-xs font-medium px-2 py-0.5 rounded-full">1,234</span>
-                            <div class="opacity-0 group-hover:opacity-100 transition-opacity">
-                                <svg class="w-4 h-4 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-                                </svg>
-                            </div>
-                        </div>
-                    </a>
-                    
-                    <a href="#" class="flex items-center px-4 py-3 text-sm font-medium text-gray-700 rounded-xl hover:bg-yellow-50 hover:text-yellow-700 transition-all duration-200 group">
+                    <!-- Verifikasi Pembayaran -->
+                    <a href="{{ route('admin.payments.index') }}" class="flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 group {{ request()->routeIs('admin.payments.*') ? 'bg-yellow-50 text-yellow-700 border-r-4 border-yellow-600' : 'text-gray-700 hover:bg-yellow-50 hover:text-yellow-700' }}">
                         <div class="p-2 bg-yellow-50 rounded-lg mr-3 group-hover:bg-yellow-100 transition-colors">
                             <svg class="h-5 w-5 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"></path>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"></path>
                             </svg>
                         </div>
                         <span>Verifikasi Pembayaran</span>
                         <div class="ml-auto flex items-center space-x-2">
-                            <span class="bg-yellow-100 text-yellow-800 text-xs font-medium px-2 py-0.5 rounded-full">56</span>
+                            @php
+                                $pendingPayments = App\Models\PaymentProof::where('verification_status', 'pending')->count();
+                            @endphp
+                            @if($pendingPayments > 0)
+                                <span class="bg-yellow-100 text-yellow-800 text-xs font-medium px-2 py-0.5 rounded-full">{{ $pendingPayments }}</span>
+                            @endif
                             <div class="opacity-0 group-hover:opacity-100 transition-opacity">
                                 <svg class="w-4 h-4 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
                                 </svg>
                             </div>
-                        </div>
-                    </a>
-                    
-                    <a href="#" class="flex items-center px-4 py-3 text-sm font-medium text-gray-700 rounded-xl hover:bg-red-50 hover:text-red-700 transition-all duration-200 group">
-                        <div class="p-2 bg-red-50 rounded-lg mr-3 group-hover:bg-red-100 transition-colors">
-                            <svg class="h-5 w-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-                            </svg>
-                        </div>
-                        <span>Review Dokumen</span>
-                        <div class="ml-auto flex items-center space-x-2">
-                            <span class="bg-red-100 text-red-800 text-xs font-medium px-2 py-0.5 rounded-full">23</span>
-                            <div class="opacity-0 group-hover:opacity-100 transition-opacity">
-                                <svg class="w-4 h-4 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-                                </svg>
-                            </div>
-                        </div>
-                    </a>
-                    
-                    <a href="#" class="flex items-center px-4 py-3 text-sm font-medium text-gray-700 rounded-xl hover:bg-emerald-50 hover:text-emerald-700 transition-all duration-200 group">
-                        <div class="p-2 bg-emerald-50 rounded-lg mr-3 group-hover:bg-emerald-100 transition-colors">
-                            <svg class="h-5 w-5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path>
-                            </svg>
-                        </div>
-                        <span>Seleksi Mahasiswa</span>
-                        <div class="ml-auto opacity-0 group-hover:opacity-100 transition-opacity">
-                            <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-                            </svg>
                         </div>
                     </a>
                 </div>
@@ -162,7 +119,8 @@
                 </div>
                 
                 <div class="space-y-1">
-                    <a href="#" class="flex items-center px-4 py-3 text-sm font-medium text-gray-700 rounded-xl hover:bg-teal-50 hover:text-teal-700 transition-all duration-200 group">
+                    <!-- Statistik Pendaftaran -->
+                    <a href="{{ route('admin.payments.statistics') }}" class="flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 group {{ request()->routeIs('admin.payments.statistics') ? 'bg-teal-50 text-teal-700 border-r-4 border-teal-600' : 'text-gray-700 hover:bg-teal-50 hover:text-teal-700' }}">
                         <div class="p-2 bg-teal-50 rounded-lg mr-3 group-hover:bg-teal-100 transition-colors">
                             <svg class="h-5 w-5 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
@@ -171,6 +129,21 @@
                         <span>Statistik Pendaftaran</span>
                         <div class="ml-auto opacity-0 group-hover:opacity-100 transition-opacity">
                             <svg class="w-4 h-4 text-teal-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                            </svg>
+                        </div>
+                    </a>
+
+                    <!-- Export Data -->
+                    <a href="{{ route('admin.payments.export') }}" class="flex items-center px-4 py-3 text-sm font-medium text-gray-700 rounded-xl hover:bg-indigo-50 hover:text-indigo-700 transition-all duration-200 group">
+                        <div class="p-2 bg-indigo-50 rounded-lg mr-3 group-hover:bg-indigo-100 transition-colors">
+                            <svg class="h-5 w-5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                            </svg>
+                        </div>
+                        <span>Export Data</span>
+                        <div class="ml-auto opacity-0 group-hover:opacity-100 transition-opacity">
+                            <svg class="w-4 h-4 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
                             </svg>
                         </div>
@@ -187,13 +160,14 @@
                 </div>
                 
                 <div class="space-y-1">
-                    <a href="#" class="flex items-center px-4 py-3 text-sm font-medium text-gray-700 rounded-xl hover:bg-blue-50 hover:text-blue-700 transition-all duration-200 group">
+                    <!-- Data Pendaftaran -->
+                    <a href="{{ route('registration.index') }}" class="flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 group {{ request()->routeIs('registration.index') ? 'bg-blue-50 text-blue-700 border-r-4 border-blue-600' : 'text-gray-700 hover:bg-blue-50 hover:text-blue-700' }}">
                         <div class="p-2 bg-blue-50 rounded-lg mr-3 group-hover:bg-blue-100 transition-colors">
                             <svg class="h-5 w-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
                             </svg>
                         </div>
-                        <span>Profil Saya</span>
+                        <span>Data Pendaftaran</span>
                         <div class="ml-auto opacity-0 group-hover:opacity-100 transition-opacity">
                             <svg class="w-4 h-4 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
@@ -201,31 +175,86 @@
                         </div>
                     </a>
                     
-                    <a href="#" class="flex items-center px-4 py-3 text-sm font-medium text-gray-700 rounded-xl hover:bg-green-50 hover:text-green-700 transition-all duration-200 group">
+                    <!-- Formulir Pendaftaran - Enhanced with dynamic status -->
+                    <a href="{{ route('registration.form') }}" class="flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 group {{ request()->routeIs('registration.form*') ? 'bg-green-50 text-green-700 border-r-4 border-green-600' : 'text-gray-700 hover:bg-green-50 hover:text-green-700' }}">
                         <div class="p-2 bg-green-50 rounded-lg mr-3 group-hover:bg-green-100 transition-colors">
                             <svg class="h-5 w-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path>
                             </svg>
                         </div>
                         <span>Formulir Pendaftaran</span>
+                        @php
+                            // Get user's registration status
+                            $userRegistration = App\Models\Registration::where('user_id', auth()->id())->first();
+                            $formStatus = 'pending';
+                            
+                            if ($userRegistration) {
+                                switch ($userRegistration->status) {
+                                    case 'waiting_documents':
+                                        $formStatus = $userRegistration->form && $userRegistration->form->is_completed ? 'draft' : 'pending';
+                                        break;
+                                    case 'waiting_decision':
+                                        $formStatus = 'submitted';
+                                        break;
+                                    case 'passed':
+                                    case 'failed':
+                                        $formStatus = 'completed';
+                                        break;
+                                    default:
+                                        $formStatus = 'locked';
+                                        break;
+                                }
+                            }
+                        @endphp
                         <div class="ml-auto">
-                            <span class="bg-yellow-100 text-yellow-800 text-xs font-medium px-2 py-0.5 rounded-full">Pending</span>
-                        </div>
-                    </a>
-                    
-                    <a href="#" class="flex items-center px-4 py-3 text-sm font-medium text-gray-700 rounded-xl hover:bg-purple-50 hover:text-purple-700 transition-all duration-200 group">
-                        <div class="p-2 bg-purple-50 rounded-lg mr-3 group-hover:bg-purple-100 transition-colors">
-                            <svg class="h-5 w-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"></path>
-                            </svg>
-                        </div>
-                        <span>Pembayaran</span>
-                        <div class="ml-auto">
-                            <span class="bg-blue-100 text-blue-800 text-xs font-medium px-2 py-0.5 rounded-full">Aktif</span>
+                            @if($formStatus === 'completed')
+                                <span class="bg-green-100 text-green-800 text-xs font-medium px-2 py-0.5 rounded-full">Selesai</span>
+                            @elseif($formStatus === 'submitted')
+                                <span class="bg-indigo-100 text-indigo-800 text-xs font-medium px-2 py-0.5 rounded-full animate-pulse">Direview</span>
+                            @elseif($formStatus === 'draft')
+                                <span class="bg-yellow-100 text-yellow-800 text-xs font-medium px-2 py-0.5 rounded-full">Draft</span>
+                            @elseif($formStatus === 'locked')
+                                <span class="bg-red-100 text-red-800 text-xs font-medium px-2 py-0.5 rounded-full">Locked</span>
+                            @else
+                                <span class="bg-gray-100 text-gray-800 text-xs font-medium px-2 py-0.5 rounded-full">Pending</span>
+                            @endif
                         </div>
                     </a>
                 </div>
             </div>
+
+            <!-- Status Information for User -->
+            @if($userRegistration)
+            <div class="pt-6">
+                <div class="flex items-center px-4 mb-3">
+                    <div class="flex-1 h-px bg-gradient-to-r from-transparent via-gray-300 to-transparent"></div>
+                    <span class="px-3 text-xs font-bold text-gray-500 uppercase tracking-wider bg-gray-50 rounded-full py-1">Status Anda</span>
+                    <div class="flex-1 h-px bg-gradient-to-r from-transparent via-gray-300 to-transparent"></div>
+                </div>
+                
+                <div class="px-4 py-3 bg-gradient-to-r {{ $userRegistration->status === 'waiting_decision' ? 'from-indigo-50 to-blue-50 border-indigo-200' : ($userRegistration->status === 'waiting_documents' ? 'from-green-50 to-emerald-50 border-green-200' : 'from-gray-50 to-gray-100 border-gray-200') }} border rounded-xl">
+                    <div class="flex items-center space-x-3">
+                        <div class="flex-shrink-0">
+                            @if($userRegistration->status === 'waiting_decision')
+                                <div class="w-3 h-3 bg-indigo-500 rounded-full animate-pulse"></div>
+                            @elseif($userRegistration->status === 'waiting_documents')
+                                <div class="w-3 h-3 bg-green-500 rounded-full"></div>
+                            @else
+                                <div class="w-3 h-3 bg-gray-400 rounded-full"></div>
+                            @endif
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <p class="text-sm font-semibold {{ $userRegistration->status === 'waiting_decision' ? 'text-indigo-800' : ($userRegistration->status === 'waiting_documents' ? 'text-green-800' : 'text-gray-800') }}">
+                                {{ $userRegistration->status_label }}
+                            </p>
+                            <p class="text-xs {{ $userRegistration->status === 'waiting_decision' ? 'text-indigo-600' : ($userRegistration->status === 'waiting_documents' ? 'text-green-600' : 'text-gray-600') }} truncate">
+                                No. {{ $userRegistration->registration_number }}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            @endif
         @endif
 
         <!-- Help Section -->

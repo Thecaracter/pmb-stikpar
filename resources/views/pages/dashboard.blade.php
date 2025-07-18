@@ -320,9 +320,9 @@
                     </div>
                 </div>
                 <div class="mt-4">
-                    <button class="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors">
+                    <a href="{{ route('registration.index') }}" class="block w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors text-center">
                         Bayar Sekarang
-                    </button>
+                    </a>
                 </div>
             </div>
 

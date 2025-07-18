@@ -16,7 +16,7 @@ return new class extends Migration {
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->foreignId('wave_id')->constrained('registration_waves')->onDelete('cascade');
             $table->foreignId('path_id')->constrained('registration_paths')->onDelete('cascade');
-            $table->enum('status', ['pending', 'waiting_payment', 'waiting_documents', 'passed', 'failed'])->default('pending');
+            $table->enum('status', ['pending', 'waiting_payment', 'waiting_documents', 'waiting_decision', 'passed', 'failed'])->default('pending');
             $table->decimal('admin_fee_paid', 10, 2)->nullable();
             $table->timestamp('payment_date')->nullable();
             $table->timestamp('document_submitted_at')->nullable();
@@ -24,9 +24,9 @@ return new class extends Migration {
             $table->text('failure_reason')->nullable();
             $table->timestamps();
 
-            $table->index(['user_id', 'wave_id']); // Index untuk query berdasarkan user dan gelombang
-            $table->index('status'); // Index untuk filter berdasarkan status
-            $table->index('registration_number'); // Index untuk pencarian nomor registrasi
+            $table->index(['user_id', 'wave_id']);
+            $table->index('status');
+            $table->index('registration_number');
         });
     }
 

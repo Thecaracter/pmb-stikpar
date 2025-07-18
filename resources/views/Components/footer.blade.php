@@ -1,19 +1,10 @@
-<!-- Minimal Beautiful Footer -->
-<footer class="relative bg-gradient-to-r from-gray-50 via-white to-gray-50 border-t border-gray-200/60">
-    <!-- Subtle background pattern -->
-    <div class="absolute inset-0 opacity-[0.03]">
-        <div class="absolute top-0 left-1/4 w-32 h-32 bg-blue-500 rounded-full blur-3xl"></div>
-        <div class="absolute top-0 right-1/4 w-24 h-24 bg-purple-500 rounded-full blur-3xl"></div>
-    </div>
-    
-    <div class="relative px-6 lg:px-8">
+<footer class="bg-gradient-to-r from-gray-50 via-white to-gray-50 border-t border-gray-200/60">
+    <div class="px-6 lg:px-8">
         <div class="py-4">
             <div class="flex flex-col sm:flex-row justify-between items-center space-y-3 sm:space-y-0">
                 
-                <!-- Left: Beautiful Brand -->
                 <div class="flex items-center space-x-4">
                     <div class="flex items-center space-x-3">
-                        <!-- Enhanced logo -->
                         <div class="relative group">
                             <div class="absolute inset-0 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-xl blur opacity-50 group-hover:opacity-70 transition-opacity"></div>
                             <div class="relative p-2 bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-700 rounded-xl shadow-lg">
@@ -23,7 +14,6 @@
                             </div>
                         </div>
                         
-                        <!-- Brand info -->
                         <div>
                             <h3 class="text-base font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent">
                                 PMB STIKPAR
@@ -33,14 +23,11 @@
                     </div>
                 </div>
                 
-                <!-- Right: Simple Copyright -->
                 <div class="flex items-center space-x-4">
-                    <!-- Copyright -->
                     <div class="text-sm text-gray-600">
                         <span class="font-medium">© {{ date('Y') }} STIK Pariwisata Indonesia</span>
                     </div>
                     
-                    <!-- Simple status -->
                     <div class="flex items-center space-x-2">
                         <div class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
                         <span class="text-xs text-gray-500">Online</span>
@@ -50,25 +37,22 @@
         </div>
     </div>
     
-    <!-- Beautiful gradient line -->
     <div class="h-1 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 opacity-60"></div>
 </footer>
 
 <style>
-/* Minimal footer styles */
 footer {
-    margin-top: auto;
+    flex-shrink: 0;
+    position: relative;
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
 }
 
-/* Logo subtle glow */
 .group:hover .absolute {
     opacity: 0.8;
     transition: opacity 0.3s ease;
 }
 
-/* Mobile responsive */
 @media (max-width: 640px) {
     footer .flex-col {
         text-align: center;
@@ -79,7 +63,6 @@ footer {
     }
 }
 
-/* Print styles */
 @media print {
     footer {
         display: none !important;

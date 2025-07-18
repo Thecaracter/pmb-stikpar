@@ -21,7 +21,6 @@ return new class extends Migration {
             $table->enum('gender', ['male', 'female']);
             $table->text('address');
             $table->string('school_origin');
-            $table->string('major_choice');
             $table->string('nisn')->nullable();
             $table->string('parent_name');
             $table->string('parent_phone');
@@ -29,14 +28,14 @@ return new class extends Migration {
             $table->decimal('parent_income', 12, 2)->nullable();
             // For achievement path:
             $table->string('achievement_type')->nullable();
-            $table->string('achievement_level')->nullable(); // national, provincial, district
+            $table->string('achievement_level')->nullable();
             $table->integer('achievement_rank')->nullable();
             $table->string('achievement_organizer')->nullable();
             $table->date('achievement_date')->nullable();
             $table->timestamps();
 
-            $table->index('registration_id'); // Index untuk relasi
-            $table->index('email'); // Index untuk pencarian email
+            $table->index('registration_id');
+            $table->index('email');
         });
     }
 
