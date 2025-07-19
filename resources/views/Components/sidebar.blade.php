@@ -247,6 +247,36 @@
                             @endif
                         </div>
                     </a>
+
+                    <!-- Check Kelulusan - BARU -->
+                    @if($userRegistration && in_array($userRegistration->status, ['waiting_decision', 'passed', 'waiting_final_payment', 'completed', 'failed', 'rejected']))
+                        <a href="{{ route('selection-result.index') }}" class="flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 group {{ request()->routeIs('selection-result.*') ? 'bg-purple-50 text-purple-700 border-r-4 border-purple-600' : 'text-gray-700 hover:bg-purple-50 hover:text-purple-700' }}">
+                            <div class="p-2 bg-purple-50 rounded-lg mr-3 group-hover:bg-purple-100 transition-colors">
+                                <svg class="h-5 w-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"></path>
+                                </svg>
+                            </div>
+                            <span>Check Kelulusan</span>
+                            <div class="ml-auto flex items-center space-x-2">
+                                @if($userRegistration->status === 'passed')
+                                    <span class="bg-green-100 text-green-800 text-xs font-medium px-2 py-0.5 rounded-full animate-pulse">Lulus!</span>
+                                @elseif($userRegistration->status === 'completed')
+                                    <span class="bg-emerald-100 text-emerald-800 text-xs font-medium px-2 py-0.5 rounded-full">Selesai</span>
+                                @elseif($userRegistration->status === 'failed')
+                                    <span class="bg-red-100 text-red-800 text-xs font-medium px-2 py-0.5 rounded-full">Gagal</span>
+                                @elseif($userRegistration->status === 'waiting_decision')
+                                    <span class="bg-indigo-100 text-indigo-800 text-xs font-medium px-2 py-0.5 rounded-full animate-pulse">Pending</span>
+                                @elseif($userRegistration->status === 'waiting_final_payment')
+                                    <span class="bg-orange-100 text-orange-800 text-xs font-medium px-2 py-0.5 rounded-full">Verif</span>
+                                @endif
+                                <div class="opacity-0 group-hover:opacity-100 transition-opacity">
+                                    <svg class="w-4 h-4 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                                    </svg>
+                                </div>
+                            </div>
+                        </a>
+                    @endif
                 </div>
             </div>
 
@@ -259,22 +289,46 @@
                     <div class="flex-1 h-px bg-gradient-to-r from-transparent via-gray-300 to-transparent"></div>
                 </div>
                 
-                <div class="px-4 py-3 bg-gradient-to-r {{ $userRegistration->status === 'waiting_decision' ? 'from-indigo-50 to-blue-50 border-indigo-200' : ($userRegistration->status === 'waiting_documents' ? 'from-green-50 to-emerald-50 border-green-200' : 'from-gray-50 to-gray-100 border-gray-200') }} border rounded-xl">
+                <div class="px-4 py-3 bg-gradient-to-r {{ 
+                    $userRegistration->status === 'completed' ? 'from-green-50 to-emerald-50 border-green-200' : 
+                    ($userRegistration->status === 'passed' ? 'from-purple-50 to-pink-50 border-purple-200' : 
+                    ($userRegistration->status === 'waiting_decision' ? 'from-indigo-50 to-blue-50 border-indigo-200' : 
+                    ($userRegistration->status === 'waiting_documents' ? 'from-green-50 to-emerald-50 border-green-200' : 
+                    ($userRegistration->status === 'failed' ? 'from-red-50 to-pink-50 border-red-200' : 'from-gray-50 to-gray-100 border-gray-200')))) 
+                }} border rounded-xl">
                     <div class="flex items-center space-x-3">
                         <div class="flex-shrink-0">
-                            @if($userRegistration->status === 'waiting_decision')
+                            @if($userRegistration->status === 'completed')
+                                <div class="w-3 h-3 bg-green-500 rounded-full"></div>
+                            @elseif($userRegistration->status === 'passed')
+                                <div class="w-3 h-3 bg-purple-500 rounded-full animate-bounce"></div>
+                            @elseif($userRegistration->status === 'waiting_decision')
                                 <div class="w-3 h-3 bg-indigo-500 rounded-full animate-pulse"></div>
                             @elseif($userRegistration->status === 'waiting_documents')
                                 <div class="w-3 h-3 bg-green-500 rounded-full"></div>
+                            @elseif($userRegistration->status === 'failed')
+                                <div class="w-3 h-3 bg-red-500 rounded-full"></div>
                             @else
                                 <div class="w-3 h-3 bg-gray-400 rounded-full"></div>
                             @endif
                         </div>
                         <div class="flex-1 min-w-0">
-                            <p class="text-sm font-semibold {{ $userRegistration->status === 'waiting_decision' ? 'text-indigo-800' : ($userRegistration->status === 'waiting_documents' ? 'text-green-800' : 'text-gray-800') }}">
+                            <p class="text-sm font-semibold {{ 
+                                $userRegistration->status === 'completed' ? 'text-green-800' : 
+                                ($userRegistration->status === 'passed' ? 'text-purple-800' : 
+                                ($userRegistration->status === 'waiting_decision' ? 'text-indigo-800' : 
+                                ($userRegistration->status === 'waiting_documents' ? 'text-green-800' : 
+                                ($userRegistration->status === 'failed' ? 'text-red-800' : 'text-gray-800')))) 
+                            }}">
                                 {{ $userRegistration->status_label }}
                             </p>
-                            <p class="text-xs {{ $userRegistration->status === 'waiting_decision' ? 'text-indigo-600' : ($userRegistration->status === 'waiting_documents' ? 'text-green-600' : 'text-gray-600') }} truncate">
+                            <p class="text-xs {{ 
+                                $userRegistration->status === 'completed' ? 'text-green-600' : 
+                                ($userRegistration->status === 'passed' ? 'text-purple-600' : 
+                                ($userRegistration->status === 'waiting_decision' ? 'text-indigo-600' : 
+                                ($userRegistration->status === 'waiting_documents' ? 'text-green-600' : 
+                                ($userRegistration->status === 'failed' ? 'text-red-600' : 'text-gray-600')))) 
+                            }} truncate">
                                 No. {{ $userRegistration->registration_number }}
                             </p>
                         </div>

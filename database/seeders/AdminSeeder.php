@@ -26,11 +26,11 @@ class AdminSeeder extends Seeder
 
         // Create test user/mahasiswa
         User::create([
-            'name' => 'Test User',
-            'email' => 'user@test.com',
+            'name' => 'Rizqi',
+            'email' => 'rizqi@gmail.com',
             'phone' => '+62812345679',
             'role' => 'user',
-            'password' => Hash::make('user123'),
+            'password' => Hash::make('12345678'),
             'email_verified_at' => now(),
         ]);
     }

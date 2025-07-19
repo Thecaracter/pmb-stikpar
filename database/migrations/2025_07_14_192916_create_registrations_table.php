@@ -16,7 +16,17 @@ return new class extends Migration {
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->foreignId('wave_id')->constrained('registration_waves')->onDelete('cascade');
             $table->foreignId('path_id')->constrained('registration_paths')->onDelete('cascade');
-            $table->enum('status', ['pending', 'waiting_payment', 'waiting_documents', 'waiting_decision', 'passed', 'failed'])->default('pending');
+            $table->enum('status', [
+                'pending',
+                'waiting_payment',
+                'waiting_documents',
+                'waiting_decision',
+                'passed',
+                'failed',
+                'waiting_final_payment',
+                'completed',
+                'rejected'
+            ])->default('pending');
             $table->decimal('admin_fee_paid', 10, 2)->nullable();
             $table->timestamp('payment_date')->nullable();
             $table->timestamp('document_submitted_at')->nullable();

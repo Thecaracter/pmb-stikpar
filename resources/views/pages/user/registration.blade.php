@@ -182,161 +182,6 @@
                                 </a>
                             </div>
                         </div>
-
-                    @elseif($existingRegistration->status === 'document_review')
-                        <!-- Dokumen Sedang Direview -->
-                        <div class="border-t pt-6">
-                            <div class="bg-indigo-50 border border-indigo-200 rounded-lg p-4">
-                                <h4 class="font-medium text-indigo-800 mb-2">Dokumen Sedang Direview</h4>
-                                <p class="text-sm text-indigo-700">
-                                    Formulir dan dokumen Anda sedang dalam proses review oleh tim seleksi. 
-                                    Hasil seleksi akan diumumkan sesuai jadwal yang telah ditentukan.
-                                </p>
-                            </div>
-                        </div>
-
-                    @elseif($existingRegistration->status === 'passed')
-                        <!-- Upload Bukti Daftar Ulang -->
-                        <div class="border-t pt-6">
-                            <h3 class="text-lg font-semibold text-gray-900 mb-4">🎉 Selamat! Anda Lulus Seleksi</h3>
-                            
-                            <div class="bg-green-50 border border-green-200 rounded-lg p-4 mb-4">
-                                <h4 class="font-medium text-green-800 mb-2">Upload Bukti Pembayaran Daftar Ulang</h4>
-                                <p class="text-sm text-green-700 mb-2">
-                                    Silakan transfer biaya daftar ulang sebesar <strong>Rp {{ number_format($existingRegistration->wave->registration_fee, 0, ',', '.') }}</strong> 
-                                    ke salah satu rekening berikut:
-                                </p>
-                                
-                                @if($bankAccounts->count() > 0)
-                                    <div class="space-y-2">
-                                        @foreach($bankAccounts as $bank)
-                                            <div class="bg-white border border-green-200 rounded p-3">
-                                                <div class="flex justify-between items-start">
-                                                    <div>
-                                                        <p class="font-medium text-gray-900">{{ $bank->bank_name }}</p>
-                                                        <p class="text-sm text-gray-600">{{ $bank->account_number }}</p>
-                                                        <p class="text-sm text-gray-600">a.n. {{ $bank->account_holder }}</p>
-                                                    </div>
-                                                    <button onclick="copyToClipboard('{{ $bank->account_number }}')" 
-                                                            class="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded hover:bg-blue-200 transition-colors">
-                                                        Copy
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        @endforeach
-                                    </div>
-                                @endif
-                            </div>
-
-                            <form id="registrationPaymentForm" enctype="multipart/form-data" class="space-y-4">
-                                @csrf
-                                
-                                <div>
-                                    <label for="registration_payment_proof" class="block text-sm font-medium text-gray-700 mb-2">
-                                        Upload Bukti Pembayaran Daftar Ulang <span class="text-red-500">*</span>
-                                    </label>
-                                    <div class="relative">
-                                        <input type="file" 
-                                               id="registration_payment_proof" 
-                                               name="payment_proof" 
-                                               accept=".jpg,.jpeg,.png,.pdf"
-                                               class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-green-50 file:text-green-700 hover:file:bg-green-100"
-                                               required>
-                                    </div>
-                                    <p class="mt-1 text-xs text-gray-500">
-                                        Format yang diizinkan: JPG, JPEG, PNG, PDF. Maksimal 5MB.
-                                    </p>
-                                </div>
-
-                                <div class="flex justify-end space-x-3">
-                                    <button type="submit" 
-                                            class="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
-                                        <span class="submit-text">Upload Bukti Daftar Ulang</span>
-                                        <span class="submit-loading hidden">
-                                            <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white inline" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                                            </svg>
-                                            Mengupload...
-                                        </span>
-                                    </button>
-                                </div>
-                            </form>
-                        </div>
-
-                    @elseif($existingRegistration->status === 'waiting_final_payment')
-                        <!-- Menunggu Verifikasi Daftar Ulang -->
-                        <div class="border-t pt-6">
-                            <div class="bg-orange-50 border border-orange-200 rounded-lg p-4">
-                                <h4 class="font-medium text-orange-800 mb-2">Bukti Daftar Ulang Sudah Diupload</h4>
-                                <p class="text-sm text-orange-700 mb-3">
-                                    Bukti pembayaran daftar ulang Anda sedang dalam proses verifikasi. 
-                                    Silakan tunggu konfirmasi dari admin.
-                                </p>
-                                @if($existingRegistration->registrationPayment)
-                                    <div class="mt-3 text-sm text-orange-600">
-                                        <strong>File:</strong> {{ $existingRegistration->registrationPayment->file_name }}<br>
-                                        <strong>Tanggal Upload:</strong> {{ $existingRegistration->registrationPayment->created_at->format('d/m/Y H:i') }}<br>
-                                        <strong>Nominal:</strong> {{ $existingRegistration->registrationPayment->formatted_amount }}
-                                    </div>
-                                @endif
-                            </div>
-                        </div>
-
-                    @elseif($existingRegistration->status === 'completed')
-                        <!-- Pendaftaran Selesai -->
-                        <div class="border-t pt-6">
-                            <div class="bg-green-50 border border-green-200 rounded-lg p-4">
-                                <h4 class="font-medium text-green-800 mb-2">🎉 Pendaftaran Selesai!</h4>
-                                <p class="text-sm text-green-700 mb-3">
-                                    Selamat! Pembayaran daftar ulang Anda telah diverifikasi. 
-                                    Pendaftaran Anda telah selesai dan Anda resmi menjadi mahasiswa baru.
-                                </p>
-                                <div class="mt-4 p-3 bg-white border border-green-200 rounded">
-                                    <p class="text-sm font-medium text-gray-900">Langkah Selanjutnya:</p>
-                                    <ul class="mt-2 text-sm text-gray-600 space-y-1">
-                                        <li>• Tunggu informasi orientasi mahasiswa baru</li>
-                                        <li>• Cek email untuk informasi lebih lanjut</li>
-                                        <li>• Siapkan dokumen untuk registrasi ulang</li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-
-                    @elseif($existingRegistration->status === 'failed')
-                        <!-- Tidak Lulus -->
-                        <div class="border-t pt-6">
-                            <div class="bg-red-50 border border-red-200 rounded-lg p-4">
-                                <h4 class="font-medium text-red-800 mb-2">Hasil Seleksi</h4>
-                                <p class="text-sm text-red-700 mb-3">
-                                    Mohon maaf, Anda belum berhasil dalam seleksi kali ini. 
-                                    Tetap semangat dan coba lagi di kesempatan berikutnya.
-                                </p>
-                                @if($existingRegistration->failure_reason)
-                                    <div class="mt-3 p-3 bg-white border border-red-200 rounded">
-                                        <p class="text-sm font-medium text-gray-900">Keterangan:</p>
-                                        <p class="text-sm text-gray-600">{{ $existingRegistration->failure_reason }}</p>
-                                    </div>
-                                @endif
-                            </div>
-                        </div>
-
-                    @elseif($existingRegistration->status === 'rejected')
-                        <!-- Pendaftaran Ditolak -->
-                        <div class="border-t pt-6">
-                            <div class="bg-red-50 border border-red-200 rounded-lg p-4">
-                                <h4 class="font-medium text-red-800 mb-2">Pendaftaran Ditolak</h4>
-                                <p class="text-sm text-red-700 mb-3">
-                                    Pendaftaran Anda ditolak oleh admin. Silakan hubungi admin untuk informasi lebih lanjut.
-                                </p>
-                                @if($existingRegistration->failure_reason)
-                                    <div class="mt-3 p-3 bg-white border border-red-200 rounded">
-                                        <p class="text-sm font-medium text-gray-900">Alasan Penolakan:</p>
-                                        <p class="text-sm text-gray-600">{{ $existingRegistration->failure_reason }}</p>
-                                    </div>
-                                @endif
-                            </div>
-                        </div>
                     @endif
 
                     <!-- Timeline -->
@@ -544,7 +389,7 @@
                                 <span class="submit-loading hidden">
                                     <svg class="animate-spin -ml-1 mr-3 h-6 w-6 text-white inline" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                                         <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 818-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                                     </svg>
                                     Membuat Pendaftaran...
                                 </span>
@@ -708,47 +553,6 @@
         const formData = new FormData(this);
         
         fetch('{{ route("registration.upload-admin-payment") }}', {
-            method: 'POST',
-            body: formData,
-            headers: {
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-            }
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                showNotification(data.message, 'success');
-                setTimeout(() => window.location.reload(), 2000);
-            } else {
-                showNotification(data.message || 'Terjadi kesalahan', 'error');
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            showNotification('Terjadi kesalahan sistem', 'error');
-        })
-        .finally(() => {
-            submitButton.disabled = false;
-            submitText.classList.remove('hidden');
-            submitLoading.classList.add('hidden');
-        });
-    });
-
-    // Registration payment form
-    document.getElementById('registrationPaymentForm')?.addEventListener('submit', function(e) {
-        e.preventDefault();
-        
-        const submitButton = this.querySelector('button[type="submit"]');
-        const submitText = submitButton.querySelector('.submit-text');
-        const submitLoading = submitButton.querySelector('.submit-loading');
-        
-        submitButton.disabled = true;
-        submitText.classList.add('hidden');
-        submitLoading.classList.remove('hidden');
-        
-        const formData = new FormData(this);
-        
-        fetch('{{ route("registration.upload-registration-payment") }}', {
             method: 'POST',
             body: formData,
             headers: {

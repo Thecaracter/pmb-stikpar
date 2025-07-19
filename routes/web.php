@@ -6,6 +6,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Admin\SettingsController;
 use App\Http\Controllers\User\RegistrationController;
 use App\Http\Controllers\User\RegistrationFormController;
+use App\Http\Controllers\User\SelectionResultController;
 use App\Http\Controllers\Admin\PaymentVerificationController;
 use App\Http\Controllers\Admin\RegistrationController as AdminRegistrationController;
 
@@ -37,6 +38,12 @@ Route::middleware(['auth', 'user'])->group(function () {
         Route::post('/form/save', [RegistrationFormController::class, 'saveForm'])->name('form.save');
         Route::post('/form/upload-document', [RegistrationFormController::class, 'uploadDocument'])->name('form.upload-document');
         Route::post('/form/submit', [RegistrationFormController::class, 'submitRegistration'])->name('form.submit');
+    });
+
+    // Selection Result Routes (CHECK KELULUSAN) - BARU
+    Route::prefix('selection-result')->name('selection-result.')->group(function () {
+        Route::get('/', [SelectionResultController::class, 'index'])->name('index');
+        Route::post('/upload', [SelectionResultController::class, 'uploadPayment'])->name('upload');
     });
 });
 

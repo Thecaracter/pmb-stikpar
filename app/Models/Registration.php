@@ -185,6 +185,30 @@ class Registration extends Model
         return $query->where('status', 'failed');
     }
 
+    /**
+     * Scope for waiting final payment
+     */
+    public function scopeWaitingFinalPayment($query)
+    {
+        return $query->where('status', 'waiting_final_payment');
+    }
+
+    /**
+     * Scope for completed registrations
+     */
+    public function scopeCompleted($query)
+    {
+        return $query->where('status', 'completed');
+    }
+
+    /**
+     * Scope for rejected registrations
+     */
+    public function scopeRejected($query)
+    {
+        return $query->where('status', 'rejected');
+    }
+
     // ===== STATUS LABELS (UPDATED) =====
 
     /**
@@ -205,6 +229,12 @@ class Registration extends Model
                 return 'Lulus Seleksi - Upload Bukti Daftar Ulang';
             case 'failed':
                 return 'Tidak Lulus Seleksi';
+            case 'waiting_final_payment':
+                return 'Menunggu Verifikasi Pembayaran Daftar Ulang';
+            case 'completed':
+                return 'Pendaftaran Selesai - Diterima';
+            case 'rejected':
+                return 'Pendaftaran Ditolak';
             default:
                 return 'Status Tidak Diketahui';
         }
@@ -228,6 +258,12 @@ class Registration extends Model
                 return 'purple';
             case 'failed':
                 return 'red';
+            case 'waiting_final_payment':
+                return 'orange';
+            case 'completed':
+                return 'emerald';
+            case 'rejected':
+                return 'gray';
             default:
                 return 'gray';
         }
@@ -251,6 +287,12 @@ class Registration extends Model
                 return 'Selamat! Anda dinyatakan LULUS seleksi. Silakan upload bukti pembayaran daftar ulang.';
             case 'failed':
                 return 'Mohon maaf, Anda belum berhasil dalam seleksi kali ini. Terima kasih atas partisipasinya.';
+            case 'waiting_final_payment':
+                return 'Bukti pembayaran daftar ulang Anda sedang diverifikasi oleh admin. Harap menunggu konfirmasi.';
+            case 'completed':
+                return 'Selamat! Pendaftaran Anda telah selesai dan Anda resmi diterima. Selamat bergabung!';
+            case 'rejected':
+                return 'Pendaftaran Anda telah ditolak. Silakan hubungi admin untuk informasi lebih lanjut.';
             default:
                 return 'Status pendaftaran tidak dikenali. Hubungi admin untuk bantuan.';
         }
@@ -327,7 +369,7 @@ class Registration extends Model
      */
     public function isCompleted()
     {
-        return in_array($this->status, ['passed', 'failed']);
+        return in_array($this->status, ['passed', 'failed', 'completed', 'rejected']);
     }
 
     /**
@@ -339,7 +381,8 @@ class Registration extends Model
             'pending',
             'waiting_payment',
             'waiting_documents',
-            'waiting_decision'
+            'waiting_decision',
+            'waiting_final_payment'
         ]);
     }
 
@@ -356,7 +399,31 @@ class Registration extends Model
      */
     public function isFailed()
     {
-        return $this->status === 'failed';
+        return in_array($this->status, ['failed', 'rejected']);
+    }
+
+    /**
+     * Check if registration is fully completed
+     */
+    public function isFullyCompleted()
+    {
+        return $this->status === 'completed';
+    }
+
+    /**
+     * Check if registration is rejected
+     */
+    public function isRejected()
+    {
+        return $this->status === 'rejected';
+    }
+
+    /**
+     * Check if registration is waiting final payment verification
+     */
+    public function isWaitingFinalPayment()
+    {
+        return $this->status === 'waiting_final_payment';
     }
 
     /**
@@ -421,7 +488,7 @@ class Registration extends Model
     }
 
     /**
-     * Get registration timeline (UPDATED with waiting_decision)
+     * Get registration timeline (UPDATED with new statuses)
      */
     public function getTimelineAttribute()
     {
@@ -466,7 +533,7 @@ class Registration extends Model
         }
 
         // 5. Under review (waiting_decision)
-        if ($this->status === 'waiting_decision') {
+        if (in_array($this->status, ['waiting_decision', 'passed', 'failed', 'waiting_final_payment', 'completed', 'rejected'])) {
             $timeline[] = [
                 'status' => 'under_review',
                 'label' => 'Berkas Sedang Direview',
@@ -477,16 +544,23 @@ class Registration extends Model
 
         // 6. Selection result
         if ($this->passed_at) {
+            $resultLabel = match ($this->status) {
+                'passed', 'waiting_final_payment', 'completed' => 'Lulus Seleksi',
+                'failed' => 'Tidak Lulus Seleksi',
+                'rejected' => 'Pendaftaran Ditolak',
+                default => $this->status === 'passed' ? 'Lulus Seleksi' : 'Tidak Lulus Seleksi'
+            };
+
             $timeline[] = [
                 'status' => 'selection_result',
-                'label' => $this->status === 'passed' ? 'Lulus Seleksi' : 'Tidak Lulus Seleksi',
+                'label' => $resultLabel,
                 'date' => $this->passed_at,
                 'completed' => true
             ];
         }
 
         // 7. Registration payment uploaded (jika lulus)
-        if ($this->status === 'passed' && $this->registrationPayment) {
+        if (in_array($this->status, ['passed', 'waiting_final_payment', 'completed']) && $this->registrationPayment) {
             $timeline[] = [
                 'status' => 'registration_payment_uploaded',
                 'label' => 'Bukti Daftar Ulang Diupload',
@@ -495,12 +569,32 @@ class Registration extends Model
             ];
         }
 
-        // 8. Registration payment verified (final)
-        if ($this->isRegistrationPaymentVerified()) {
+        // 8. Registration payment verified / Final status
+        if ($this->status === 'waiting_final_payment' && $this->registrationPayment) {
             $timeline[] = [
-                'status' => 'registration_payment_verified',
-                'label' => 'Daftar Ulang Diverifikasi - Selesai',
-                'date' => $this->registrationPayment->verified_at ?? $this->registrationPayment->updated_at,
+                'status' => 'waiting_final_verification',
+                'label' => 'Menunggu Verifikasi Daftar Ulang',
+                'date' => $this->registrationPayment->created_at,
+                'completed' => false
+            ];
+        }
+
+        // 9. Final completion
+        if ($this->status === 'completed') {
+            $timeline[] = [
+                'status' => 'registration_completed',
+                'label' => 'Pendaftaran Selesai - Diterima',
+                'date' => $this->registrationPayment->verified_at ?? $this->updated_at,
+                'completed' => true
+            ];
+        }
+
+        // Handle rejected status
+        if ($this->status === 'rejected') {
+            $timeline[] = [
+                'status' => 'registration_rejected',
+                'label' => 'Pendaftaran Ditolak',
+                'date' => $this->updated_at,
                 'completed' => true
             ];
         }

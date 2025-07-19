@@ -78,12 +78,27 @@ class PaymentVerificationController extends Controller
             $waves = \App\Models\RegistrationWave::orderBy('wave_number')->get();
             $paths = \App\Models\RegistrationPath::orderBy('name')->get();
 
-            // Statistics
+            // Statistics with detailed breakdown
             $stats = [
                 'total' => PaymentProof::count(),
                 'pending' => PaymentProof::where('verification_status', 'pending')->count(),
                 'approved' => PaymentProof::where('verification_status', 'approved')->count(),
                 'rejected' => PaymentProof::where('verification_status', 'rejected')->count(),
+
+                // Payment type breakdown
+                'admin_payments' => PaymentProof::where('payment_type', 'administration')->count(),
+                'registration_payments' => PaymentProof::where('payment_type', 'registration')->count(),
+
+                // Pending by type
+                'pending_admin' => PaymentProof::where('verification_status', 'pending')
+                    ->where('payment_type', 'administration')->count(),
+                'pending_registration' => PaymentProof::where('verification_status', 'pending')
+                    ->where('payment_type', 'registration')->count(),
+
+                // Today's activity
+                'today_total' => PaymentProof::whereDate('created_at', today())->count(),
+                'today_verified' => PaymentProof::whereDate('updated_at', today())
+                    ->whereIn('verification_status', ['approved', 'rejected'])->count(),
             ];
 
             return view('pages.admin.payment-verification', compact(
@@ -109,6 +124,12 @@ class PaymentVerificationController extends Controller
                     'pending' => 0,
                     'approved' => 0,
                     'rejected' => 0,
+                    'admin_payments' => 0,
+                    'registration_payments' => 0,
+                    'pending_admin' => 0,
+                    'pending_registration' => 0,
+                    'today_total' => 0,
+                    'today_verified' => 0,
                 ]
             ])->with('error', 'Terjadi kesalahan saat memuat halaman verifikasi pembayaran.');
         }
@@ -136,13 +157,13 @@ class PaymentVerificationController extends Controller
                 'user_id' => auth()->id()
             ]);
 
-            return redirect()->route('admin.payment-verification.index')
+            return redirect()->route('admin.payments.index')
                 ->with('error', 'Data pembayaran tidak ditemukan.');
         }
     }
 
     /**
-     * Approve payment
+     * Approve payment with updated status logic
      */
     public function approve(Request $request, $id)
     {
@@ -174,21 +195,34 @@ class PaymentVerificationController extends Controller
 
             // Update payment status
             $payment->update([
-                'verification_status' => 'approved'
+                'verification_status' => 'approved',
+                'verified_at' => now(),
+                'verified_by' => auth()->id(),
+                'verification_notes' => $request->notes
             ]);
 
-            // Update registration status and admin fee
+            // Update registration status based on payment type
             $registration = $payment->registration;
-            $registration->update([
-                'status' => 'waiting_documents',
-                'admin_fee_paid' => $payment->amount
-            ]);
+
+            if ($payment->payment_type === 'administration') {
+                // Admin payment approved - allow form filling
+                $registration->update([
+                    'status' => 'waiting_documents',
+                    'admin_fee_paid' => $payment->amount
+                ]);
+            } elseif ($payment->payment_type === 'registration') {
+                // Registration payment approved - complete the process
+                $registration->update([
+                    'status' => 'completed'
+                ]);
+            }
 
             // Log activity
             Log::info('Payment approved', [
                 'payment_id' => $payment->id,
                 'registration_id' => $registration->id,
                 'admin_id' => auth()->id(),
+                'payment_type' => $payment->payment_type,
                 'amount' => $payment->amount,
                 'notes' => $request->notes
             ]);
@@ -218,7 +252,7 @@ class PaymentVerificationController extends Controller
     }
 
     /**
-     * Reject payment
+     * Reject payment with updated status logic
      */
     public function reject(Request $request, $id)
     {
@@ -251,21 +285,34 @@ class PaymentVerificationController extends Controller
 
             // Update payment status
             $payment->update([
-                'verification_status' => 'rejected'
+                'verification_status' => 'rejected',
+                'verified_at' => now(),
+                'verified_by' => auth()->id(),
+                'verification_notes' => $request->reason
             ]);
 
-            // Update registration status back to pending
+            // Update registration status based on payment type
             $registration = $payment->registration;
-            $registration->update([
-                'status' => 'pending',
-                'admin_fee_paid' => null
-            ]);
+
+            if ($payment->payment_type === 'administration') {
+                // Admin payment rejected - back to pending
+                $registration->update([
+                    'status' => 'pending',
+                    'admin_fee_paid' => null
+                ]);
+            } elseif ($payment->payment_type === 'registration') {
+                // Registration payment rejected - back to passed (need to re-upload)
+                $registration->update([
+                    'status' => 'passed'
+                ]);
+            }
 
             // Log activity
             Log::info('Payment rejected', [
                 'payment_id' => $payment->id,
                 'registration_id' => $registration->id,
                 'admin_id' => auth()->id(),
+                'payment_type' => $payment->payment_type,
                 'reason' => $request->reason
             ]);
 
@@ -294,7 +341,7 @@ class PaymentVerificationController extends Controller
     }
 
     /**
-     * Bulk approve payments
+     * Bulk approve payments with updated logic
      */
     public function bulkApprove(Request $request)
     {
@@ -337,14 +384,23 @@ class PaymentVerificationController extends Controller
             foreach ($payments as $payment) {
                 // Update payment status
                 $payment->update([
-                    'verification_status' => 'approved'
+                    'verification_status' => 'approved',
+                    'verified_at' => now(),
+                    'verified_by' => auth()->id(),
+                    'verification_notes' => $request->notes
                 ]);
 
-                // Update registration status
-                $payment->registration->update([
-                    'status' => 'waiting_documents',
-                    'admin_fee_paid' => $payment->amount
-                ]);
+                // Update registration status based on payment type
+                if ($payment->payment_type === 'administration') {
+                    $payment->registration->update([
+                        'status' => 'waiting_documents',
+                        'admin_fee_paid' => $payment->amount
+                    ]);
+                } elseif ($payment->payment_type === 'registration') {
+                    $payment->registration->update([
+                        'status' => 'completed'
+                    ]);
+                }
 
                 $approved_count++;
             }
@@ -410,6 +466,19 @@ class PaymentVerificationController extends Controller
                 'administration_payments' => PaymentProof::where('payment_type', 'administration')->count(),
                 'registration_payments' => PaymentProof::where('payment_type', 'registration')->count(),
 
+                // Registration status breakdown
+                'registration_status' => [
+                    'pending' => Registration::where('status', 'pending')->count(),
+                    'waiting_payment' => Registration::where('status', 'waiting_payment')->count(),
+                    'waiting_documents' => Registration::where('status', 'waiting_documents')->count(),
+                    'waiting_decision' => Registration::where('status', 'waiting_decision')->count(),
+                    'passed' => Registration::where('status', 'passed')->count(),
+                    'waiting_final_payment' => Registration::where('status', 'waiting_final_payment')->count(),
+                    'completed' => Registration::where('status', 'completed')->count(),
+                    'failed' => Registration::where('status', 'failed')->count(),
+                    'rejected' => Registration::where('status', 'rejected')->count(),
+                ],
+
                 // Monthly trend (last 6 months)
                 'monthly_trend' => $this->getMonthlyTrend(),
 
@@ -443,7 +512,8 @@ class PaymentVerificationController extends Controller
         try {
             $payment = PaymentProof::findOrFail($id);
 
-            if (!Storage::disk('public')->exists($payment->file_path)) {
+            $filePath = public_path($payment->file_path);
+            if (!file_exists($filePath)) {
                 return redirect()->back()->with('error', 'File tidak ditemukan');
             }
 
@@ -454,10 +524,7 @@ class PaymentVerificationController extends Controller
                 'downloaded_by' => auth()->id()
             ]);
 
-            return Storage::disk('public')->download(
-                $payment->file_path,
-                $payment->file_name
-            );
+            return response()->download($filePath, $payment->file_name);
 
         } catch (\Exception $e) {
             Log::error('Error downloading payment file', [

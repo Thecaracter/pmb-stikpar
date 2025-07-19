@@ -29,6 +29,11 @@ class RegistrationController extends Controller
                 ->with(['wave', 'path', 'documentUploads'])
                 ->first();
 
+            // Redirect ke check kelulusan jika sudah dalam tahap advanced
+            if ($existingRegistration && in_array($existingRegistration->status, ['waiting_decision', 'passed', 'waiting_final_payment', 'completed', 'failed', 'rejected'])) {
+                return redirect()->route('selection-result.index');
+            }
+
             // Load payment proofs if registration exists
             if ($existingRegistration) {
                 $existingRegistration->load(['adminPayment', 'registrationPayment']);
@@ -379,123 +384,6 @@ class RegistrationController extends Controller
             DB::rollback();
 
             Log::error('Error uploading admin payment proof', [
-                'error' => $e->getMessage(),
-                'user_id' => Auth::id(),
-                'trace' => $e->getTraceAsString()
-            ]);
-
-            return response()->json([
-                'success' => false,
-                'message' => 'Terjadi kesalahan: ' . $e->getMessage()
-            ], 500);
-        }
-    }
-
-    /**
-     * Upload bukti pembayaran daftar ulang
-     */
-    public function uploadRegistrationPayment(Request $request)
-    {
-        $maxUploadSize = Configuration::getValue('max_upload_size', 5120);
-        $allowedTypes = Configuration::getValue('allowed_file_types', 'pdf,jpg,jpeg,png');
-
-        $validator = Validator::make($request->all(), [
-            'payment_proof' => [
-                'required',
-                'file',
-                'mimes:' . $allowedTypes,
-                'max:' . $maxUploadSize,
-            ]
-        ], [
-            'payment_proof.required' => 'Bukti pembayaran daftar ulang harus diupload',
-            'payment_proof.file' => 'File tidak valid',
-            'payment_proof.mimes' => 'File harus berformat: ' . strtoupper(str_replace(',', ', ', $allowedTypes)),
-            'payment_proof.max' => 'Ukuran file maksimal ' . ($maxUploadSize >= 1024 ? round($maxUploadSize / 1024, 1) . 'MB' : $maxUploadSize . 'KB'),
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Validasi gagal',
-                'errors' => $validator->errors()
-            ], 422);
-        }
-
-        try {
-            $user = Auth::user();
-            $registration = Registration::where('user_id', $user->id)
-                ->where('status', 'passed')
-                ->first();
-
-            if (!$registration) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Pendaftaran tidak ditemukan atau belum lulus seleksi'
-                ], 400);
-            }
-
-            $existingPayment = PaymentProof::where('registration_id', $registration->id)
-                ->where('payment_type', 'registration')
-                ->first();
-
-            if ($existingPayment) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Bukti pembayaran daftar ulang sudah diupload sebelumnya'
-                ], 400);
-            }
-
-            $file = $request->file('payment_proof');
-            $originalName = $file->getClientOriginalName();
-            $extension = $file->getClientOriginalExtension();
-            $fileName = time() . '_registration_' . $user->id . '_' . $registration->registration_number . '.' . $extension;
-
-            // Create directory if not exists
-            $uploadPath = public_path('bukti_daftar_ulang');
-            if (!file_exists($uploadPath)) {
-                mkdir($uploadPath, 0755, true);
-            }
-
-            // Move file directly to public folder
-            $filePath = 'bukti_daftar_ulang/' . $fileName;
-            $success = $file->move($uploadPath, $fileName);
-
-            if (!$success) {
-                throw new \Exception('Gagal menyimpan file ke storage');
-            }
-
-            DB::beginTransaction();
-
-            PaymentProof::create([
-                'registration_id' => $registration->id,
-                'payment_type' => 'registration',
-                'file_name' => $originalName,
-                'file_path' => $filePath,
-                'mime_type' => $file->getMimeType(),
-                'file_size' => $file->getSize(),
-                'amount' => $registration->wave->registration_fee,
-                'verification_status' => 'pending',
-            ]);
-
-            $registration->update([
-                'status' => 'waiting_final_payment',
-            ]);
-
-            DB::commit();
-
-            return response()->json([
-                'success' => true,
-                'message' => 'Bukti pembayaran daftar ulang berhasil diupload! Menunggu verifikasi admin.',
-                'data' => [
-                    'file_name' => $originalName,
-                    'status' => 'waiting_final_payment'
-                ]
-            ]);
-
-        } catch (\Exception $e) {
-            DB::rollback();
-
-            Log::error('Error uploading registration payment proof', [
                 'error' => $e->getMessage(),
                 'user_id' => Auth::id(),
                 'trace' => $e->getTraceAsString()
