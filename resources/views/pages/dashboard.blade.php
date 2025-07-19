@@ -24,7 +24,7 @@
                     </div>
                     <div class="ml-4">
                         <p class="text-sm font-medium text-gray-500">Total Pendaftar</p>
-                        <p class="text-2xl font-bold text-gray-900">1,234</p>
+                        <p class="text-2xl font-bold text-gray-900">{{ number_format($stats['total_registrations']) }}</p>
                     </div>
                 </div>
             </div>
@@ -39,7 +39,7 @@
                     </div>
                     <div class="ml-4">
                         <p class="text-sm font-medium text-gray-500">Pembayaran Tertunda</p>
-                        <p class="text-2xl font-bold text-gray-900">56</p>
+                        <p class="text-2xl font-bold text-gray-900">{{ $stats['pending_payments'] }}</p>
                     </div>
                 </div>
             </div>
@@ -53,8 +53,8 @@
                         </svg>
                     </div>
                     <div class="ml-4">
-                        <p class="text-sm font-medium text-gray-500">Dokumen Pending</p>
-                        <p class="text-2xl font-bold text-gray-900">23</p>
+                        <p class="text-sm font-medium text-gray-500">Menunggu Keputusan</p>
+                        <p class="text-2xl font-bold text-gray-900">{{ $stats['waiting_decision'] }}</p>
                     </div>
                 </div>
             </div>
@@ -69,7 +69,7 @@
                     </div>
                     <div class="ml-4">
                         <p class="text-sm font-medium text-gray-500">Lulus Seleksi</p>
-                        <p class="text-2xl font-bold text-gray-900">891</p>
+                        <p class="text-2xl font-bold text-gray-900">{{ $stats['passed_students'] }}</p>
                     </div>
                 </div>
             </div>
@@ -89,41 +89,41 @@
                     </div>
                 </div>
                 <p class="text-sm text-gray-600 mb-4">Atur biaya, jadwal, dan kuota pendaftaran</p>
-                <button class="w-full bg-purple-600 text-white py-2 px-4 rounded-lg hover:bg-purple-700 transition-colors">
+                <a href="{{ route('admin.settings.index') }}" class="block w-full bg-purple-600 text-white py-2 px-4 rounded-lg hover:bg-purple-700 transition-colors text-center">
                     Kelola Konfigurasi
-                </button>
+                </a>
             </div>
 
-            <!-- Manajemen Bank -->
+            <!-- Verifikasi Pembayaran -->
             <div class="bg-white rounded-lg shadow-sm p-6">
                 <div class="flex items-center justify-between mb-4">
-                    <h3 class="text-lg font-semibold text-gray-900">Akun Bank</h3>
-                    <div class="p-2 bg-blue-100 rounded-lg">
-                        <svg class="h-5 w-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <h3 class="text-lg font-semibold text-gray-900">Verifikasi Pembayaran</h3>
+                    <div class="p-2 bg-yellow-100 rounded-lg">
+                        <svg class="h-5 w-5 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"></path>
                         </svg>
                     </div>
                 </div>
-                <p class="text-sm text-gray-600 mb-4">Kelola informasi rekening pembayaran</p>
-                <button class="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors">
-                    Kelola Bank
-                </button>
+                <p class="text-sm text-gray-600 mb-4">{{ $stats['pending_payments'] }} pembayaran menunggu verifikasi</p>
+                <a href="{{ route('admin.payments.index') }}" class="block w-full bg-yellow-600 text-white py-2 px-4 rounded-lg hover:bg-yellow-700 transition-colors text-center">
+                    Kelola Pembayaran
+                </a>
             </div>
 
-            <!-- Laporan -->
+            <!-- Data Pendaftar -->
             <div class="bg-white rounded-lg shadow-sm p-6">
                 <div class="flex items-center justify-between mb-4">
-                    <h3 class="text-lg font-semibold text-gray-900">Laporan</h3>
-                    <div class="p-2 bg-green-100 rounded-lg">
-                        <svg class="h-5 w-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                    <h3 class="text-lg font-semibold text-gray-900">Data Pendaftar</h3>
+                    <div class="p-2 bg-blue-100 rounded-lg">
+                        <svg class="h-5 w-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"></path>
                         </svg>
                     </div>
                 </div>
-                <p class="text-sm text-gray-600 mb-4">Lihat statistik dan laporan pendaftaran</p>
-                <button class="w-full bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700 transition-colors">
-                    Lihat Laporan
-                </button>
+                <p class="text-sm text-gray-600 mb-4">Lihat dan kelola semua data pendaftar</p>
+                <a href="{{ route('admin.registrations.index') }}" class="block w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors text-center">
+                    Kelola Data
+                </a>
             </div>
         </div>
 
@@ -133,6 +133,7 @@
             <div class="bg-white rounded-lg shadow-sm p-6">
                 <h3 class="text-lg font-semibold text-gray-900 mb-4">Aktivitas Terbaru</h3>
                 <div class="space-y-4">
+                    @forelse($recentRegistrations as $registration)
                     <div class="flex items-start space-x-3">
                         <div class="flex-shrink-0">
                             <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
@@ -143,40 +144,13 @@
                         </div>
                         <div class="flex-1 min-w-0">
                             <p class="text-sm font-medium text-gray-900">Pendaftar baru</p>
-                            <p class="text-sm text-gray-500">John Doe mendaftar sebagai mahasiswa baru</p>
-                            <p class="text-xs text-gray-400 mt-1">2 menit yang lalu</p>
+                            <p class="text-sm text-gray-500">{{ $registration->user->name }} mendaftar sebagai mahasiswa baru</p>
+                            <p class="text-xs text-gray-400 mt-1">{{ $registration->created_at->diffForHumans() }}</p>
                         </div>
                     </div>
-
-                    <div class="flex items-start space-x-3">
-                        <div class="flex-shrink-0">
-                            <div class="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
-                                <svg class="h-4 w-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"></path>
-                                </svg>
-                            </div>
-                        </div>
-                        <div class="flex-1 min-w-0">
-                            <p class="text-sm font-medium text-gray-900">Pembayaran diterima</p>
-                            <p class="text-sm text-gray-500">Jane Smith melakukan pembayaran Rp 500.000</p>
-                            <p class="text-xs text-gray-400 mt-1">15 menit yang lalu</p>
-                        </div>
-                    </div>
-
-                    <div class="flex items-start space-x-3">
-                        <div class="flex-shrink-0">
-                            <div class="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center">
-                                <svg class="h-4 w-4 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-                                </svg>
-                            </div>
-                        </div>
-                        <div class="flex-1 min-w-0">
-                            <p class="text-sm font-medium text-gray-900">Dokumen diupload</p>
-                            <p class="text-sm text-gray-500">Mike Johnson mengupload ijazah SMA</p>
-                            <p class="text-xs text-gray-400 mt-1">1 jam yang lalu</p>
-                        </div>
-                    </div>
+                    @empty
+                    <p class="text-gray-500 text-sm">Belum ada aktivitas terbaru</p>
+                    @endforelse
                 </div>
             </div>
 
@@ -184,44 +158,61 @@
             <div class="bg-white rounded-lg shadow-sm p-6">
                 <h3 class="text-lg font-semibold text-gray-900 mb-4">Tugas Pending</h3>
                 <div class="space-y-4">
+                    @if($pendingTasks['document_review'] > 0)
                     <div class="flex items-center justify-between p-3 bg-red-50 rounded-lg">
                         <div class="flex items-center space-x-3">
                             <div class="w-2 h-2 bg-red-500 rounded-full"></div>
                             <div>
-                                <p class="text-sm font-medium text-gray-900">Verifikasi Dokumen</p>
-                                <p class="text-xs text-gray-500">23 dokumen menunggu verifikasi</p>
+                                <p class="text-sm font-medium text-gray-900">Menunggu Keputusan</p>
+                                <p class="text-xs text-gray-500">{{ $pendingTasks['document_review'] }} pendaftar menunggu keputusan</p>
                             </div>
                         </div>
-                        <button class="text-red-600 hover:text-red-700 text-sm font-medium">
+                        <a href="{{ route('admin.registrations.index') }}?status=waiting_decision" class="text-red-600 hover:text-red-700 text-sm font-medium">
                             Lihat
-                        </button>
+                        </a>
                     </div>
+                    @endif
 
+                    @if($pendingTasks['payment_verification'] > 0)
                     <div class="flex items-center justify-between p-3 bg-yellow-50 rounded-lg">
                         <div class="flex items-center space-x-3">
                             <div class="w-2 h-2 bg-yellow-500 rounded-full"></div>
                             <div>
                                 <p class="text-sm font-medium text-gray-900">Konfirmasi Pembayaran</p>
-                                <p class="text-xs text-gray-500">12 pembayaran perlu dikonfirmasi</p>
+                                <p class="text-xs text-gray-500">{{ $pendingTasks['payment_verification'] }} pembayaran perlu dikonfirmasi</p>
                             </div>
                         </div>
-                        <button class="text-yellow-600 hover:text-yellow-700 text-sm font-medium">
+                        <a href="{{ route('admin.payments.index') }}" class="text-yellow-600 hover:text-yellow-700 text-sm font-medium">
                             Lihat
-                        </button>
+                        </a>
                     </div>
+                    @endif
 
+                    @if($pendingTasks['form_review'] > 0)
                     <div class="flex items-center justify-between p-3 bg-blue-50 rounded-lg">
                         <div class="flex items-center space-x-3">
                             <div class="w-2 h-2 bg-blue-500 rounded-full"></div>
                             <div>
                                 <p class="text-sm font-medium text-gray-900">Review Formulir</p>
-                                <p class="text-xs text-gray-500">8 formulir perlu di-review</p>
+                                <p class="text-xs text-gray-500">{{ $pendingTasks['form_review'] }} formulir perlu di-review</p>
                             </div>
                         </div>
-                        <button class="text-blue-600 hover:text-blue-700 text-sm font-medium">
+                        <a href="{{ route('admin.registrations.index') }}" class="text-blue-600 hover:text-blue-700 text-sm font-medium">
                             Lihat
-                        </button>
+                        </a>
                     </div>
+                    @endif
+
+                    @if(array_sum($pendingTasks) == 0)
+                    <div class="flex items-center justify-center p-8 text-gray-500">
+                        <div class="text-center">
+                            <svg class="h-12 w-12 text-gray-300 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                            <p class="text-sm">Semua tugas sudah selesai! 🎉</p>
+                        </div>
+                    </div>
+                    @endif
                 </div>
             </div>
         </div>
@@ -241,68 +232,135 @@
             <div class="flex items-center justify-between">
                 <!-- Step 1 -->
                 <div class="flex flex-col items-center">
-                    <div class="w-10 h-10 bg-green-500 rounded-full flex items-center justify-center text-white font-bold text-sm">
-                        ✓
+                    <div class="w-10 h-10 {{ $progressSteps['account'] ? 'bg-green-500' : 'bg-gray-300' }} rounded-full flex items-center justify-center text-white font-bold text-sm">
+                        @if($progressSteps['account'])
+                            ✓
+                        @else
+                            1
+                        @endif
                     </div>
                     <span class="text-xs text-gray-600 mt-2 text-center">Registrasi<br>Akun</span>
                 </div>
                 
                 <!-- Connector -->
-                <div class="flex-1 h-0.5 bg-gray-300 mx-2"></div>
+                <div class="flex-1 h-0.5 {{ $progressSteps['admin_fee'] ? 'bg-green-500' : 'bg-gray-300' }} mx-2"></div>
                 
                 <!-- Step 2 -->
                 <div class="flex flex-col items-center">
-                    <div class="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center text-white font-bold text-sm">
-                        2
+                    <div class="w-10 h-10 {{ $progressSteps['admin_fee'] ? 'bg-green-500' : ($progressSteps['account'] ? 'bg-blue-500' : 'bg-gray-300') }} rounded-full flex items-center justify-center text-white font-bold text-sm">
+                        @if($progressSteps['admin_fee'])
+                            ✓
+                        @else
+                            2
+                        @endif
                     </div>
                     <span class="text-xs text-gray-600 mt-2 text-center">Biaya<br>Administrasi</span>
                 </div>
                 
                 <!-- Connector -->
-                <div class="flex-1 h-0.5 bg-gray-300 mx-2"></div>
+                <div class="flex-1 h-0.5 {{ $progressSteps['upload_proof'] ? 'bg-green-500' : 'bg-gray-300' }} mx-2"></div>
                 
                 <!-- Step 3 -->
                 <div class="flex flex-col items-center">
-                    <div class="w-10 h-10 bg-gray-300 rounded-full flex items-center justify-center text-gray-600 font-bold text-sm">
-                        3
+                    <div class="w-10 h-10 {{ $progressSteps['upload_proof'] ? 'bg-green-500' : 'bg-gray-300' }} rounded-full flex items-center justify-center text-white font-bold text-sm">
+                        @if($progressSteps['upload_proof'])
+                            ✓
+                        @else
+                            3
+                        @endif
                     </div>
                     <span class="text-xs text-gray-600 mt-2 text-center">Upload<br>Bukti</span>
                 </div>
                 
                 <!-- Connector -->
-                <div class="flex-1 h-0.5 bg-gray-300 mx-2"></div>
+                <div class="flex-1 h-0.5 {{ $progressSteps['fill_form'] ? 'bg-green-500' : 'bg-gray-300' }} mx-2"></div>
                 
                 <!-- Step 4 -->
                 <div class="flex flex-col items-center">
-                    <div class="w-10 h-10 bg-gray-300 rounded-full flex items-center justify-center text-gray-600 font-bold text-sm">
-                        4
+                    <div class="w-10 h-10 {{ $progressSteps['fill_form'] ? 'bg-green-500' : 'bg-gray-300' }} rounded-full flex items-center justify-center text-white font-bold text-sm">
+                        @if($progressSteps['fill_form'])
+                            ✓
+                        @else
+                            4
+                        @endif
                     </div>
                     <span class="text-xs text-gray-600 mt-2 text-center">Isi<br>Formulir</span>
                 </div>
                 
                 <!-- Connector -->
-                <div class="flex-1 h-0.5 bg-gray-300 mx-2"></div>
+                <div class="flex-1 h-0.5 {{ $progressSteps['upload_docs'] ? 'bg-green-500' : 'bg-gray-300' }} mx-2"></div>
                 
                 <!-- Step 5 -->
                 <div class="flex flex-col items-center">
-                    <div class="w-10 h-10 bg-gray-300 rounded-full flex items-center justify-center text-gray-600 font-bold text-sm">
-                        5
+                    <div class="w-10 h-10 {{ $progressSteps['upload_docs'] ? 'bg-green-500' : 'bg-gray-300' }} rounded-full flex items-center justify-center text-white font-bold text-sm">
+                        @if($progressSteps['upload_docs'])
+                            ✓
+                        @else
+                            5
+                        @endif
                     </div>
                     <span class="text-xs text-gray-600 mt-2 text-center">Upload<br>Dokumen</span>
                 </div>
                 
                 <!-- Connector -->
-                <div class="flex-1 h-0.5 bg-gray-300 mx-2"></div>
+                <div class="flex-1 h-0.5 {{ $progressSteps['waiting'] ? 'bg-green-500' : 'bg-gray-300' }} mx-2"></div>
                 
                 <!-- Step 6 -->
                 <div class="flex flex-col items-center">
-                    <div class="w-10 h-10 bg-gray-300 rounded-full flex items-center justify-center text-gray-600 font-bold text-sm">
-                        6
+                    <div class="w-10 h-10 {{ $progressSteps['waiting'] ? 'bg-green-500' : 'bg-gray-300' }} rounded-full flex items-center justify-center text-white font-bold text-sm">
+                        @if($progressSteps['waiting'])
+                            ✓
+                        @else
+                            6
+                        @endif
                     </div>
                     <span class="text-xs text-gray-600 mt-2 text-center">Menunggu<br>Kelulusan</span>
                 </div>
             </div>
         </div>
+
+        <!-- Registration Status Card -->
+        @if($registration)
+        <div class="bg-white rounded-lg shadow-sm p-6">
+            <h2 class="text-lg font-semibold text-gray-900 mb-4">Status Pendaftaran Anda</h2>
+            <div class="bg-gradient-to-r {{ $registration->status === 'passed' ? 'from-green-50 to-green-100 border-green-200' : ($registration->status === 'failed' ? 'from-red-50 to-red-100 border-red-200' : 'from-blue-50 to-blue-100 border-blue-200') }} border rounded-lg p-4">
+                <div class="flex items-center space-x-3">
+                    <div class="flex-shrink-0">
+                        @if($registration->status === 'passed')
+                            <div class="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center">
+                                <svg class="h-5 w-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                </svg>
+                            </div>
+                        @elseif($registration->status === 'failed')
+                            <div class="w-8 h-8 bg-red-500 rounded-full flex items-center justify-center">
+                                <svg class="h-5 w-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                </svg>
+                            </div>
+                        @else
+                            <div class="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center animate-pulse">
+                                <svg class="h-5 w-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                            </div>
+                        @endif
+                    </div>
+                    <div class="flex-1">
+                        <p class="text-lg font-semibold {{ $registration->status === 'passed' ? 'text-green-800' : ($registration->status === 'failed' ? 'text-red-800' : 'text-blue-800') }}">
+                            {{ $registration->status_label ?? ucfirst(str_replace('_', ' ', $registration->status)) }}
+                        </p>
+                        <p class="text-sm {{ $registration->status === 'passed' ? 'text-green-600' : ($registration->status === 'failed' ? 'text-red-600' : 'text-blue-600') }}">
+                            No. Pendaftaran: {{ $registration->registration_number }}
+                        </p>
+                        @if($registration->failure_reason)
+                        <p class="text-sm text-red-600 mt-1">Alasan: {{ $registration->failure_reason }}</p>
+                        @endif
+                    </div>
+                </div>
+            </div>
+        </div>
+        @endif
 
         <!-- Quick Actions -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -340,9 +398,15 @@
                     </div>
                 </div>
                 <div class="mt-4">
-                    <button class="w-full bg-gray-400 text-white py-2 px-4 rounded-lg cursor-not-allowed" disabled>
-                        Belum Tersedia
-                    </button>
+                    @if($registration && $registration->adminPayment && $registration->adminPayment->verification_status === 'approved')
+                        <a href="{{ route('registration.form') }}" class="block w-full bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700 transition-colors text-center">
+                            Isi Formulir
+                        </a>
+                    @else
+                        <button class="w-full bg-gray-400 text-white py-2 px-4 rounded-lg cursor-not-allowed" disabled>
+                            Bayar Biaya Admin Dulu
+                        </button>
+                    @endif
                 </div>
             </div>
 
@@ -360,9 +424,15 @@
                     </div>
                 </div>
                 <div class="mt-4">
-                    <button class="w-full bg-gray-400 text-white py-2 px-4 rounded-lg cursor-not-allowed" disabled>
-                        Belum Tersedia
-                    </button>
+                    @if($registration && $registration->form && $registration->form->is_completed)
+                        <a href="{{ route('registration.form') }}" class="block w-full bg-purple-600 text-white py-2 px-4 rounded-lg hover:bg-purple-700 transition-colors text-center">
+                            Upload Dokumen
+                        </a>
+                    @else
+                        <button class="w-full bg-gray-400 text-white py-2 px-4 rounded-lg cursor-not-allowed" disabled>
+                            Isi Formulir Dulu
+                        </button>
+                    @endif
                 </div>
             </div>
         </div>

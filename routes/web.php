@@ -2,10 +2,12 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\AuthController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Admin\SettingsController;
-use App\Http\Controllers\Admin\PaymentVerificationController;
 use App\Http\Controllers\User\RegistrationController;
 use App\Http\Controllers\User\RegistrationFormController;
+use App\Http\Controllers\Admin\PaymentVerificationController;
+use App\Http\Controllers\Admin\RegistrationController as AdminRegistrationController;
 
 Route::get('/', [AuthController::class, 'showLoginForm']);
 
@@ -16,10 +18,8 @@ Route::get('/register', [AuthController::class, 'showRegistrationForm'])->name('
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
-// Dashboard Routes
-Route::middleware('auth')->get('/dashboard', function () {
-    return view('pages.dashboard');
-})->name('dashboard');
+// Dashboard Routes - Updated menggunakan DashboardController
+Route::middleware('auth')->get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
 // User Routes - menggunakan middleware 'user' yang sudah ada
 Route::middleware(['auth', 'user'])->group(function () {
@@ -68,5 +68,17 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
         Route::get('/download/{id}', [PaymentVerificationController::class, 'downloadFile'])->name('download');
         Route::get('/export/data', [PaymentVerificationController::class, 'export'])->name('export');
         Route::get('/api/statistics', [PaymentVerificationController::class, 'statistics'])->name('statistics');
+    });
+
+    // Registration Management (Data Pendaftar) - YANG DIBUTUHKAN - DIPERBAIKI
+    Route::prefix('registrations')->name('registrations.')->group(function () {
+        Route::get('/', [AdminRegistrationController::class, 'index'])->name('index');
+        Route::get('/{id}', [AdminRegistrationController::class, 'show'])->name('show'); // FIXED: Added this route
+        Route::put('/{id}/status', [AdminRegistrationController::class, 'updateStatus'])->name('update-status');
+        Route::put('/{id}/data', [AdminRegistrationController::class, 'updateData'])->name('update-data');
+        Route::delete('/{id}', [AdminRegistrationController::class, 'destroy'])->name('destroy');
+        Route::post('/bulk-action', [AdminRegistrationController::class, 'bulkAction'])->name('bulk-action');
+        Route::get('/export/excel', [AdminRegistrationController::class, 'exportExcel'])->name('export-excel');
+        Route::get('/export/pdf', [AdminRegistrationController::class, 'exportPdf'])->name('export-pdf');
     });
 });
