@@ -137,46 +137,7 @@
                 </div>
             </div>
 
-            <!-- Reports Section -->
-            <div class="pt-6">
-                <div class="flex items-center px-4 mb-3">
-                    <div class="flex-1 h-px bg-gradient-to-r from-transparent via-gray-300 to-transparent"></div>
-                    <span class="px-3 text-xs font-bold text-gray-500 uppercase tracking-wider bg-gray-50 rounded-full py-1">Laporan</span>
-                    <div class="flex-1 h-px bg-gradient-to-r from-transparent via-gray-300 to-transparent"></div>
-                </div>
-                
-                <div class="space-y-1">
-                    <!-- Statistik Pendaftaran -->
-                    <a href="{{ route('admin.payments.statistics') }}" class="flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 group {{ request()->routeIs('admin.payments.statistics') ? 'bg-teal-50 text-teal-700 border-r-4 border-teal-600' : 'text-gray-700 hover:bg-teal-50 hover:text-teal-700' }}">
-                        <div class="p-2 bg-teal-50 rounded-lg mr-3 group-hover:bg-teal-100 transition-colors">
-                            <svg class="h-5 w-5 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
-                            </svg>
-                        </div>
-                        <span>Statistik Pendaftaran</span>
-                        <div class="ml-auto opacity-0 group-hover:opacity-100 transition-opacity">
-                            <svg class="w-4 h-4 text-teal-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-                            </svg>
-                        </div>
-                    </a>
-
-                    <!-- Export Data -->
-                    <a href="{{ route('admin.payments.export') }}" class="flex items-center px-4 py-3 text-sm font-medium text-gray-700 rounded-xl hover:bg-indigo-50 hover:text-indigo-700 transition-all duration-200 group">
-                        <div class="p-2 bg-indigo-50 rounded-lg mr-3 group-hover:bg-indigo-100 transition-colors">
-                            <svg class="h-5 w-5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-                            </svg>
-                        </div>
-                        <span>Export Data</span>
-                        <div class="ml-auto opacity-0 group-hover:opacity-100 transition-opacity">
-                            <svg class="w-4 h-4 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-                            </svg>
-                        </div>
-                    </a>
-                </div>
-            </div>
+           
         @else
             <!-- User Menu -->
             <div class="pt-6">
@@ -218,6 +179,7 @@
                             if ($userRegistration) {
                                 switch ($userRegistration->status) {
                                     case 'waiting_documents':
+                                    case 'waiting_payment':  // TAMBAHAN: Allow form access for waiting_payment
                                         $formStatus = $userRegistration->form && $userRegistration->form->is_completed ? 'draft' : 'pending';
                                         break;
                                     case 'waiting_decision':
@@ -294,7 +256,8 @@
                     ($userRegistration->status === 'passed' ? 'from-purple-50 to-pink-50 border-purple-200' : 
                     ($userRegistration->status === 'waiting_decision' ? 'from-indigo-50 to-blue-50 border-indigo-200' : 
                     ($userRegistration->status === 'waiting_documents' ? 'from-green-50 to-emerald-50 border-green-200' : 
-                    ($userRegistration->status === 'failed' ? 'from-red-50 to-pink-50 border-red-200' : 'from-gray-50 to-gray-100 border-gray-200')))) 
+                    ($userRegistration->status === 'waiting_payment' ? 'from-orange-50 to-yellow-50 border-orange-200' :
+                    ($userRegistration->status === 'failed' ? 'from-red-50 to-pink-50 border-red-200' : 'from-gray-50 to-gray-100 border-gray-200'))))) 
                 }} border rounded-xl">
                     <div class="flex items-center space-x-3">
                         <div class="flex-shrink-0">
@@ -306,6 +269,8 @@
                                 <div class="w-3 h-3 bg-indigo-500 rounded-full animate-pulse"></div>
                             @elseif($userRegistration->status === 'waiting_documents')
                                 <div class="w-3 h-3 bg-green-500 rounded-full"></div>
+                            @elseif($userRegistration->status === 'waiting_payment')
+                                <div class="w-3 h-3 bg-orange-500 rounded-full animate-pulse"></div>
                             @elseif($userRegistration->status === 'failed')
                                 <div class="w-3 h-3 bg-red-500 rounded-full"></div>
                             @else
@@ -318,7 +283,8 @@
                                 ($userRegistration->status === 'passed' ? 'text-purple-800' : 
                                 ($userRegistration->status === 'waiting_decision' ? 'text-indigo-800' : 
                                 ($userRegistration->status === 'waiting_documents' ? 'text-green-800' : 
-                                ($userRegistration->status === 'failed' ? 'text-red-800' : 'text-gray-800')))) 
+                                ($userRegistration->status === 'waiting_payment' ? 'text-orange-800' :
+                                ($userRegistration->status === 'failed' ? 'text-red-800' : 'text-gray-800'))))) 
                             }}">
                                 {{ $userRegistration->status_label }}
                             </p>
@@ -327,7 +293,8 @@
                                 ($userRegistration->status === 'passed' ? 'text-purple-600' : 
                                 ($userRegistration->status === 'waiting_decision' ? 'text-indigo-600' : 
                                 ($userRegistration->status === 'waiting_documents' ? 'text-green-600' : 
-                                ($userRegistration->status === 'failed' ? 'text-red-600' : 'text-gray-600')))) 
+                                ($userRegistration->status === 'waiting_payment' ? 'text-orange-600' :
+                                ($userRegistration->status === 'failed' ? 'text-red-600' : 'text-gray-600'))))) 
                             }} truncate">
                                 No. {{ $userRegistration->registration_number }}
                             </p>

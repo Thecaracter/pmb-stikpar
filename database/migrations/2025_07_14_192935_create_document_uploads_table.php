@@ -15,28 +15,35 @@ return new class extends Migration {
             $table->foreignId('registration_id')->constrained()->onDelete('cascade');
             $table->enum('document_type', [
                 'payment_proof',
-                'diploma',
-                'family_card',
-                'id_card',
                 'photo',
+                'family_card',
+                'birth_certificate',
+                'id_card',
+                'diploma',
+                'report_card',
+                'baptism_certificate',
+                'pastor_recommendation',
+                'marriage_certificate',
                 'kip_certificate',
                 'poverty_certificate',
-                'report_card',
                 'achievement_certificate',
                 'achievement_recommendation',
                 'achievement_award',
                 'achievement_documentation'
             ]);
+            $table->string('document_name');
             $table->string('file_name');
             $table->string('file_path');
             $table->string('mime_type');
             $table->integer('file_size');
+            $table->boolean('is_required')->default(true);
             $table->enum('verification_status', ['pending', 'approved', 'rejected'])->default('pending');
             $table->text('verification_notes')->nullable();
             $table->timestamps();
 
-            $table->index(['registration_id', 'document_type']); // Index untuk query dokumen per registrasi
-            $table->index('verification_status'); // Index untuk filter status verifikasi
+            $table->index(['registration_id', 'document_type']);
+            $table->index('verification_status');
+            $table->unique(['registration_id', 'document_type']);
         });
     }
 

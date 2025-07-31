@@ -151,27 +151,27 @@ class DocumentUpload extends Model
     }
 
     /**
-     * Get document type name based on document_type
+     * Get document type name based on document_type - UPDATED with correct names
      */
     public function getDocumentTypeName()
     {
         $documentTypes = [
             'payment_proof' => 'Bukti Pembayaran',
-            'photo' => 'Foto',
-            'diploma' => 'Ijazah/Surat Keterangan Lulus',
-            'birth_certificate' => 'Akta Kelahiran',
-            'id_card' => 'KTP',
+            'photo' => 'Pas Foto',
             'family_card' => 'Kartu Keluarga',
+            'birth_certificate' => 'Akta Kelahiran',
+            'id_card' => 'KTP/KIA',
+            'diploma' => 'Ijazah SMA/SMK',
+            'report_card' => 'Rapor',
             'baptism_certificate' => 'Surat Baptis',
-            'pastor_recommendation' => 'Surat Rekomendasi Pastor',
-            'marriage_certificate' => 'Surat Nikah',
+            'pastor_recommendation' => 'Surat Rekomendasi Gereja',
+            'marriage_certificate' => 'Surat Nikah', // UPDATED: For student's marriage certificate
             'kip_certificate' => 'Kartu KIP',
-            'report_card' => 'Raport',
+            'poverty_certificate' => 'Surat Keterangan Tidak Mampu',
             'achievement_certificate' => 'Sertifikat Prestasi',
             'achievement_recommendation' => 'Surat Rekomendasi Prestasi',
             'achievement_award' => 'Piagam Penghargaan',
             'achievement_documentation' => 'Dokumentasi Prestasi',
-            'poverty_certificate' => 'Surat Keterangan Tidak Mampu',
         ];
 
         return $documentTypes[$this->document_type] ?? ucfirst(str_replace('_', ' ', $this->document_type));
@@ -210,12 +210,13 @@ class DocumentUpload extends Model
     }
 
     /**
-     * Get file URL
+     * Get file URL - UPDATED to use public path instead of storage
      */
     public function getFileUrlAttribute()
     {
         if ($this->file_path) {
-            return asset('storage/' . $this->file_path);
+            // Since files are stored in public folder, use asset() directly
+            return asset($this->file_path);
         }
         return null;
     }
@@ -232,5 +233,157 @@ class DocumentUpload extends Model
         ];
 
         return $badges[$this->verification_status] ?? $badges['pending'];
+    }
+
+    /**
+     * Get required status badge - NEW method for UI
+     */
+    public function getRequiredBadgeAttribute()
+    {
+        if ($this->is_required) {
+            return '<span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800">Wajib</span>';
+        } else {
+            return '<span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800">Opsional</span>';
+        }
+    }
+
+    /**
+     * Get document description based on type - NEW method
+     */
+    public function getDocumentDescription()
+    {
+        $descriptions = [
+            'photo' => 'Pas foto terbaru ukuran 3x4 dengan latar belakang putih',
+            'family_card' => 'Fotocopy Kartu Keluarga yang masih berlaku',
+            'birth_certificate' => 'Fotocopy akta kelahiran',
+            'id_card' => 'Fotocopy KTP atau Kartu Identitas Anak',
+            'diploma' => 'Fotocopy ijazah SMA/SMK/MA yang telah dilegalisir',
+            'report_card' => 'Fotocopy rapor kelas 11 dan 12 semester 1 yang telah dilegalisir',
+            'baptism_certificate' => 'Surat baptis dari gereja (khusus yang beragama Kristen)',
+            'pastor_recommendation' => 'Surat rekomendasi dari pastor/pendeta gereja',
+            'marriage_certificate' => 'Fotocopy surat nikah (khusus yang sudah menikah)',
+            'kip_certificate' => 'Fotocopy Kartu Indonesia Pintar (KIP)',
+            'poverty_certificate' => 'SKTM dari kelurahan/desa setempat',
+            'achievement_certificate' => 'Fotocopy sertifikat prestasi yang dimiliki',
+            'achievement_recommendation' => 'Surat rekomendasi terkait prestasi (opsional)',
+        ];
+
+        return $descriptions[$this->document_type] ?? 'Dokumen pendukung pendaftaran';
+    }
+
+    /**
+     * Check if file exists in public directory - NEW method
+     */
+    public function fileExists()
+    {
+        if (!$this->file_path) {
+            return false;
+        }
+
+        return file_exists(public_path($this->file_path));
+    }
+
+    /**
+     * Get file extension - NEW method
+     */
+    public function getFileExtensionAttribute()
+    {
+        return pathinfo($this->file_name, PATHINFO_EXTENSION);
+    }
+
+    /**
+     * Check if file is image - NEW method
+     */
+    public function isImage()
+    {
+        $imageExtensions = ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp'];
+        return in_array(strtolower($this->file_extension), $imageExtensions);
+    }
+
+    /**
+     * Check if file is PDF - NEW method
+     */
+    public function isPdf()
+    {
+        return strtolower($this->file_extension) === 'pdf';
+    }
+
+    /**
+     * Get file icon class for UI - NEW method
+     */
+    public function getFileIconAttribute()
+    {
+        if ($this->isImage()) {
+            return 'fas fa-image text-blue-500';
+        } elseif ($this->isPdf()) {
+            return 'fas fa-file-pdf text-red-500';
+        } else {
+            return 'fas fa-file text-gray-500';
+        }
+    }
+
+    /**
+     * Scope for registration path - NEW scope
+     */
+    public function scopeForPath($query, $pathCode)
+    {
+        return $query->whereHas('registration', function ($q) use ($pathCode) {
+            $q->whereHas('path', function ($q2) use ($pathCode) {
+                $q2->where('code', $pathCode);
+            });
+        });
+    }
+
+    /**
+     * Get validation errors if any - NEW method for better error handling
+     */
+    public function getValidationErrors()
+    {
+        $errors = [];
+
+        // Check file existence
+        if (!$this->fileExists()) {
+            $errors[] = 'File tidak ditemukan di server';
+        }
+
+        // Check file size
+        if ($this->file_size > 5242880) { // 5MB
+            $errors[] = 'Ukuran file melebihi batas maksimal 5MB';
+        }
+
+        // Check mime type
+        $allowedTypes = ['image/jpeg', 'image/png', 'image/jpg', 'application/pdf'];
+        if (!in_array($this->mime_type, $allowedTypes)) {
+            $errors[] = 'Tipe file tidak diizinkan';
+        }
+
+        return $errors;
+    }
+
+    /**
+     * Mark as verified by admin - NEW method
+     */
+    public function markAsVerified($adminId, $notes = null)
+    {
+        $this->update([
+            'verification_status' => 'approved',
+            'verified_by' => $adminId,
+            'verified_at' => now(),
+            'verification_notes' => $notes
+        ]);
+    }
+
+    /**
+     * Mark as rejected by admin - NEW method
+     */
+    public function markAsRejected($adminId, $reason, $notes = null)
+    {
+        $this->update([
+            'verification_status' => 'rejected',
+            'verified_by' => $adminId,
+            'verified_at' => now(),
+            'rejection_reason' => $reason,
+            'verification_notes' => $notes
+        ]);
     }
 }

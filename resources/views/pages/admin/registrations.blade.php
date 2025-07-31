@@ -226,7 +226,11 @@
                         <label class="block text-sm font-medium text-gray-700 mb-2">Jalur</label>
                         <select name="path_id" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
                             <option value="">Semua Jalur</option>
-                            <!-- Add paths options if available -->
+                            @foreach($paths as $path)
+                                <option value="{{ $path->id }}" {{ request('path_id') == $path->id ? 'selected' : '' }}>
+                                    {{ $path->name }}
+                                </option>
+                            @endforeach
                         </select>
                     </div>
                     <div class="flex items-end space-x-2">
@@ -331,50 +335,46 @@
                                 <div class="text-sm text-gray-500">{{ $registration->path->name ?? '-' }}</div>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
-                                @if(function_exists('getStatusBadge'))
-                                    {!! getStatusBadge($registration->status) !!}
-                                @else
-                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium 
-                                        @if($registration->status === 'pending') bg-gray-100 text-gray-800 border border-gray-200
-                                        @elseif($registration->status === 'waiting_payment') bg-yellow-100 text-yellow-800 border border-yellow-200
-                                        @elseif($registration->status === 'waiting_documents') bg-blue-100 text-blue-800 border border-blue-200
-                                        @elseif($registration->status === 'waiting_decision') bg-orange-100 text-orange-800 border border-orange-200
-                                        @elseif($registration->status === 'passed') bg-green-100 text-green-800 border border-green-200
-                                        @elseif($registration->status === 'failed') bg-red-100 text-red-800 border border-red-200
-                                        @else bg-gray-100 text-gray-800 @endif">
-                                        @if($registration->status === 'pending')
-                                            <div class="w-2 h-2 bg-gray-400 rounded-full mr-2"></div>
-                                            Pending
-                                        @elseif($registration->status === 'waiting_payment')
-                                            <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                                                <path fill-rule="evenodd" d="M4 4a2 2 0 00-2 2v4a2 2 0 002 2V6h10a2 2 0 00-2-2H4zm2 6a2 2 0 012-2h8a2 2 0 012 2v4a2 2 0 01-2 2H8a2 2 0 01-2-2v-4zm6 4a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"></path>
-                                            </svg>
-                                            Menunggu Pembayaran
-                                        @elseif($registration->status === 'waiting_documents')
-                                            <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                                                <path fill-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4z" clip-rule="evenodd"></path>
-                                            </svg>
-                                            Menunggu Dokumen
-                                        @elseif($registration->status === 'waiting_decision')
-                                            <svg class="w-3 h-3 mr-1 animate-pulse" fill="currentColor" viewBox="0 0 20 20">
-                                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"></path>
-                                            </svg>
-                                            Menunggu Keputusan
-                                        @elseif($registration->status === 'passed')
-                                            <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
-                                            </svg>
-                                            Lulus
-                                        @elseif($registration->status === 'failed')
-                                            <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                                                <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path>
-                                            </svg>
-                                            Gagal
-                                        @else
-                                            {{ ucfirst($registration->status) }}
-                                        @endif
-                                    </span>
-                                @endif
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium 
+                                    @if($registration->status === 'pending') bg-gray-100 text-gray-800 border border-gray-200
+                                    @elseif($registration->status === 'waiting_payment') bg-yellow-100 text-yellow-800 border border-yellow-200
+                                    @elseif($registration->status === 'waiting_documents') bg-blue-100 text-blue-800 border border-blue-200
+                                    @elseif($registration->status === 'waiting_decision') bg-orange-100 text-orange-800 border border-orange-200
+                                    @elseif($registration->status === 'passed') bg-green-100 text-green-800 border border-green-200
+                                    @elseif($registration->status === 'failed') bg-red-100 text-red-800 border border-red-200
+                                    @else bg-gray-100 text-gray-800 @endif">
+                                    @if($registration->status === 'pending')
+                                        <div class="w-2 h-2 bg-gray-400 rounded-full mr-2"></div>
+                                        Pending
+                                    @elseif($registration->status === 'waiting_payment')
+                                        <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd" d="M4 4a2 2 0 00-2 2v4a2 2 0 002 2V6h10a2 2 0 00-2-2H4zm2 6a2 2 0 012-2h8a2 2 0 012 2v4a2 2 0 01-2 2H8a2 2 0 01-2-2v-4zm6 4a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"></path>
+                                        </svg>
+                                        Menunggu Pembayaran
+                                    @elseif($registration->status === 'waiting_documents')
+                                        <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4z" clip-rule="evenodd"></path>
+                                        </svg>
+                                        Menunggu Dokumen
+                                    @elseif($registration->status === 'waiting_decision')
+                                        <svg class="w-3 h-3 mr-1 animate-pulse" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"></path>
+                                        </svg>
+                                        Menunggu Keputusan
+                                    @elseif($registration->status === 'passed')
+                                        <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                                        </svg>
+                                        Lulus
+                                    @elseif($registration->status === 'failed')
+                                        <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path>
+                                        </svg>
+                                        Gagal
+                                    @else
+                                        {{ ucfirst($registration->status) }}
+                                    @endif
+                                </span>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                 {{ $registration->created_at->format('d/m/Y H:i') }}
@@ -438,50 +438,46 @@
                                 <div class="text-xs font-mono text-gray-400 mt-1">{{ $registration->registration_number }}</div>
                             </div>
                         </div>
-                        @if(function_exists('getStatusBadge'))
-                            {!! getStatusBadge($registration->status) !!}
-                        @else
-                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium 
-                                @if($registration->status === 'pending') bg-gray-100 text-gray-800 border border-gray-200
-                                @elseif($registration->status === 'waiting_payment') bg-yellow-100 text-yellow-800 border border-yellow-200
-                                @elseif($registration->status === 'waiting_documents') bg-blue-100 text-blue-800 border border-blue-200
-                                @elseif($registration->status === 'waiting_decision') bg-orange-100 text-orange-800 border border-orange-200
-                                @elseif($registration->status === 'passed') bg-green-100 text-green-800 border border-green-200
-                                @elseif($registration->status === 'failed') bg-red-100 text-red-800 border border-red-200
-                                @else bg-gray-100 text-gray-800 @endif">
-                                @if($registration->status === 'pending')
-                                    <div class="w-2 h-2 bg-gray-400 rounded-full mr-2"></div>
-                                    Pending
-                                @elseif($registration->status === 'waiting_payment')
-                                    <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                                        <path fill-rule="evenodd" d="M4 4a2 2 0 00-2 2v4a2 2 0 002 2V6h10a2 2 0 00-2-2H4zm2 6a2 2 0 012-2h8a2 2 0 012 2v4a2 2 0 01-2 2H8a2 2 0 01-2-2v-4zm6 4a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"></path>
-                                    </svg>
-                                    Menunggu Pembayaran
-                                @elseif($registration->status === 'waiting_documents')
-                                    <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                                        <path fill-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4z" clip-rule="evenodd"></path>
-                                    </svg>
-                                    Menunggu Dokumen
-                                @elseif($registration->status === 'waiting_decision')
-                                    <svg class="w-3 h-3 mr-1 animate-pulse" fill="currentColor" viewBox="0 0 20 20">
-                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"></path>
-                                    </svg>
-                                    Menunggu Keputusan
-                                @elseif($registration->status === 'passed')
-                                    <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                                        <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
-                                    </svg>
-                                    Lulus
-                                @elseif($registration->status === 'failed')
-                                    <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                                        <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path>
-                                    </svg>
-                                    Gagal
-                                @else
-                                    {{ ucfirst($registration->status) }}
-                                @endif
-                            </span>
-                        @endif
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium 
+                            @if($registration->status === 'pending') bg-gray-100 text-gray-800 border border-gray-200
+                            @elseif($registration->status === 'waiting_payment') bg-yellow-100 text-yellow-800 border border-yellow-200
+                            @elseif($registration->status === 'waiting_documents') bg-blue-100 text-blue-800 border border-blue-200
+                            @elseif($registration->status === 'waiting_decision') bg-orange-100 text-orange-800 border border-orange-200
+                            @elseif($registration->status === 'passed') bg-green-100 text-green-800 border border-green-200
+                            @elseif($registration->status === 'failed') bg-red-100 text-red-800 border border-red-200
+                            @else bg-gray-100 text-gray-800 @endif">
+                            @if($registration->status === 'pending')
+                                <div class="w-2 h-2 bg-gray-400 rounded-full mr-2"></div>
+                                Pending
+                            @elseif($registration->status === 'waiting_payment')
+                                <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M4 4a2 2 0 00-2 2v4a2 2 0 002 2V6h10a2 2 0 00-2-2H4zm2 6a2 2 0 012-2h8a2 2 0 012 2v4a2 2 0 01-2 2H8a2 2 0 01-2-2v-4zm6 4a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"></path>
+                                </svg>
+                                Menunggu Pembayaran
+                            @elseif($registration->status === 'waiting_documents')
+                                <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4z" clip-rule="evenodd"></path>
+                                </svg>
+                                Menunggu Dokumen
+                            @elseif($registration->status === 'waiting_decision')
+                                <svg class="w-3 h-3 mr-1 animate-pulse" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"></path>
+                                </svg>
+                                Menunggu Keputusan
+                            @elseif($registration->status === 'passed')
+                                <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                                </svg>
+                                Lulus
+                            @elseif($registration->status === 'failed')
+                                <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path>
+                                </svg>
+                                Gagal
+                            @else
+                                {{ ucfirst($registration->status) }}
+                            @endif
+                        </span>
                     </div>
                     
                     <div class="grid grid-cols-2 gap-2 text-xs text-gray-500 mb-3">
@@ -692,8 +688,6 @@
     </div>
 </div>
 
-{{-- Removed duplicate getStatusBadge function to avoid redeclaration error --}}
-
 <script>
 let currentActiveTab = 'all';
 
@@ -803,55 +797,11 @@ function refreshData() {
 
 // Export Data Function
 function exportData() {
-    // Simple CSV export functionality
     const currentTab = document.getElementById('current-tab').value;
     const searchParam = new URLSearchParams(window.location.search).get('search') || '';
     const waveParam = new URLSearchParams(window.location.search).get('wave_id') || '';
     
-    // You can implement actual export logic here
-    // For now, we'll show a notification
     alert(`Export ${currentTab} data dengan filter: ${searchParam ? 'Search: ' + searchParam : 'Semua data'}${waveParam ? ', Gelombang: ' + waveParam : ''}`);
-    
-    // Alternative: Download current visible data as CSV
-    // exportVisibleDataAsCSV();
-}
-
-// Optional: Export visible data as CSV
-function exportVisibleDataAsCSV() {
-    const rows = document.querySelectorAll('.registration-row');
-    const visibleRows = Array.from(rows).filter(row => row.style.display !== 'none');
-    
-    if (visibleRows.length === 0) {
-        alert('Tidak ada data untuk diekspor');
-        return;
-    }
-    
-    let csvContent = "Nama,Email,Nomor Registrasi,Gelombang,Jalur,Status,Tanggal\n";
-    
-    visibleRows.forEach(row => {
-        const cells = row.querySelectorAll('td');
-        if (cells.length > 1) {
-            const name = cells[1].querySelector('.text-sm.font-medium')?.textContent || '';
-            const email = cells[1].querySelector('.text-sm.text-gray-500')?.textContent || '';
-            const regNumber = cells[2].querySelector('.text-sm.font-mono')?.textContent || '';
-            const wave = cells[3].querySelector('.text-sm.font-medium')?.textContent || '';
-            const path = cells[3].querySelector('.text-sm.text-gray-500')?.textContent || '';
-            const status = cells[4].textContent.trim() || '';
-            const date = cells[5].textContent.trim() || '';
-            
-            csvContent += `"${name}","${email}","${regNumber}","${wave}","${path}","${status}","${date}"\n`;
-        }
-    });
-    
-    // Create download link
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    const link = document.createElement('a');
-    link.href = URL.createObjectURL(blob);
-    link.download = `data_pendaftar_${new Date().toISOString().split('T')[0]}.csv`;
-    link.style.display = 'none';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
 }
 
 function registrationManager() {
@@ -932,12 +882,10 @@ function registrationManager() {
         // Methods
         toggleSelectAll() {
             if (this.selectAll) {
-                // Select all visible checkboxes
                 const visibleCheckboxes = Array.from(document.querySelectorAll('input[x-model="selectedIds"]'))
                     .filter(cb => cb.closest('.registration-row').style.display !== 'none');
                 this.selectedIds = visibleCheckboxes.map(cb => cb.value);
             } else {
-                // Deselect all
                 this.selectedIds = [];
             }
         },
@@ -1104,12 +1052,24 @@ function registrationManager() {
                                                 <span class="text-sm font-medium text-gray-900">${data.form.full_name}</span>
                                             </div>
                                             <div class="flex flex-col sm:flex-row sm:justify-between">
+                                                <span class="text-sm text-gray-600 font-medium">NISN:</span>
+                                                <span class="text-sm font-medium text-gray-900">${data.form.nisn || '-'}</span>
+                                            </div>
+                                            <div class="flex flex-col sm:flex-row sm:justify-between">
                                                 <span class="text-sm text-gray-600 font-medium">No. HP:</span>
                                                 <span class="text-sm font-medium text-gray-900">${data.form.phone_number || '-'}</span>
                                             </div>
                                             <div class="flex flex-col sm:flex-row sm:justify-between">
-                                                <span class="text-sm text-gray-600 font-medium">Tempat Lahir:</span>
-                                                <span class="text-sm font-medium text-gray-900">${data.form.birth_place || '-'}</span>
+                                                <span class="text-sm text-gray-600 font-medium">Agama:</span>
+                                                <span class="text-sm font-medium text-gray-900">${data.form.religion || '-'}</span>
+                                            </div>
+                                            <div class="flex flex-col sm:flex-row sm:justify-between">
+                                                <span class="text-sm text-gray-600 font-medium">Nama Paroki:</span>
+                                                <span class="text-sm font-medium text-gray-900">${data.form.parish_name || '-'}</span>
+                                            </div>
+                                            <div class="flex flex-col sm:flex-row sm:justify-between">
+                                                <span class="text-sm text-gray-600 font-medium">TTL:</span>
+                                                <span class="text-sm font-medium text-gray-900">${data.form.birth_place || '-'}, ${data.form.birth_date || '-'}</span>
                                             </div>
                                             <div class="flex flex-col sm:flex-row sm:justify-between">
                                                 <span class="text-sm text-gray-600 font-medium">Jenis Kelamin:</span>
@@ -1128,6 +1088,118 @@ function registrationManager() {
                                     `}
                                 </div>
                             </div>
+
+                            <!-- Grid untuk Data Sekolah & Orang Tua -->
+                            ${data.form ? `
+                            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                                <!-- Data Sekolah -->
+                                <div class="bg-white rounded-xl p-5 border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
+                                    <div class="flex items-center mb-4">
+                                        <div class="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center mr-3">
+                                            <svg class="w-4 h-4 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-4m-5 0H9m11 0a2 2 0 01-2 2H7a2 2 0 01-2-2m2 0V9a2 2 0 012-2h2a2 2 0 012 2v10"></path>
+                                            </svg>
+                                        </div>
+                                        <h4 class="font-semibold text-gray-900">Data Sekolah</h4>
+                                    </div>
+                                    <div class="space-y-3">
+                                        <div class="flex flex-col sm:flex-row sm:justify-between">
+                                            <span class="text-sm text-gray-600 font-medium">Asal Sekolah:</span>
+                                            <span class="text-sm font-medium text-gray-900">${data.form.school_origin || '-'}</span>
+                                        </div>
+                                        ${data.form.grade_8_sem2 ? `
+                                        <div class="flex flex-col sm:flex-row sm:justify-between">
+                                            <span class="text-sm text-gray-600 font-medium">Nilai Kelas 8 Sem 2:</span>
+                                            <span class="text-sm font-medium text-gray-900">${data.form.grade_8_sem2}</span>
+                                        </div>
+                                        ` : ''}
+                                        ${data.form.grade_9_sem1 ? `
+                                        <div class="flex flex-col sm:flex-row sm:justify-between">
+                                            <span class="text-sm text-gray-600 font-medium">Nilai Kelas 9 Sem 1:</span>
+                                            <span class="text-sm font-medium text-gray-900">${data.form.grade_9_sem1}</span>
+                                        </div>
+                                        ` : ''}
+                                        ${data.form.achievement_type ? `
+                                        <div class="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+                                            <h6 class="text-xs font-medium text-yellow-800 uppercase tracking-wide mb-2">Data Prestasi</h6>
+                                            <div class="space-y-2">
+                                                <div class="flex flex-col sm:flex-row sm:justify-between">
+                                                    <span class="text-xs text-yellow-700 font-medium">Jenis:</span>
+                                                    <span class="text-xs text-yellow-900">${data.form.achievement_type}</span>
+                                                </div>
+                                                <div class="flex flex-col sm:flex-row sm:justify-between">
+                                                    <span class="text-xs text-yellow-700 font-medium">Tingkat:</span>
+                                                    <span class="text-xs text-yellow-900">${data.form.achievement_level || '-'}</span>
+                                                </div>
+                                                <div class="flex flex-col sm:flex-row sm:justify-between">
+                                                    <span class="text-xs text-yellow-700 font-medium">Peringkat:</span>
+                                                    <span class="text-xs text-yellow-900">${data.form.achievement_rank || '-'}</span>
+                                                </div>
+                                                <div class="flex flex-col sm:flex-row sm:justify-between">
+                                                    <span class="text-xs text-yellow-700 font-medium">Penyelenggara:</span>
+                                                    <span class="text-xs text-yellow-900">${data.form.achievement_organizer || '-'}</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        ` : ''}
+                                    </div>
+                                </div>
+
+                                <!-- Data Orang Tua -->
+                                <div class="bg-white rounded-xl p-5 border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
+                                    <div class="flex items-center mb-4">
+                                        <div class="w-8 h-8 bg-pink-100 rounded-lg flex items-center justify-center mr-3">
+                                            <svg class="w-4 h-4 text-pink-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                                            </svg>
+                                        </div>
+                                        <h4 class="font-semibold text-gray-900">Data Orang Tua</h4>
+                                    </div>
+                                    <div class="space-y-3">
+                                        <div class="flex flex-col sm:flex-row sm:justify-between">
+                                            <span class="text-sm text-gray-600 font-medium">Nama Ayah:</span>
+                                            <span class="text-sm font-medium text-gray-900">${data.form.parent_name || '-'}</span>
+                                        </div>
+                                        <div class="flex flex-col sm:flex-row sm:justify-between">
+                                            <span class="text-sm text-gray-600 font-medium">Pekerjaan Ayah:</span>
+                                            <span class="text-sm font-medium text-gray-900">${data.form.parent_job || '-'}</span>
+                                        </div>
+                                        <div class="flex flex-col sm:flex-row sm:justify-between">
+                                            <span class="text-sm text-gray-600 font-medium">No. HP Ayah:</span>
+                                            <span class="text-sm font-medium text-gray-900">${data.form.parent_phone || '-'}</span>
+                                        </div>
+                                        <div class="flex flex-col sm:flex-row sm:justify-between">
+                                            <span class="text-sm text-gray-600 font-medium">Nama Ibu:</span>
+                                            <span class="text-sm font-medium text-gray-900">${data.form.mother_name || '-'}</span>
+                                        </div>
+                                        <div class="flex flex-col sm:flex-row sm:justify-between">
+                                            <span class="text-sm text-gray-600 font-medium">Pekerjaan Ibu:</span>
+                                            <span class="text-sm font-medium text-gray-900">${data.form.mother_job || '-'}</span>
+                                        </div>
+                                        ${data.form.parent_income ? `
+                                        <div class="flex flex-col sm:flex-row sm:justify-between">
+                                            <span class="text-sm text-gray-600 font-medium">Penghasilan:</span>
+                                            <span class="text-sm font-medium text-gray-900">Rp ${new Intl.NumberFormat('id-ID').format(data.form.parent_income)}</span>
+                                        </div>
+                                        ` : ''}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Alamat -->
+                            <div class="bg-white rounded-xl p-5 border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
+                                <div class="flex items-center mb-4">
+                                    <div class="w-8 h-8 bg-teal-100 rounded-lg flex items-center justify-center mr-3">
+                                        <svg class="w-4 h-4 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                        </svg>
+                                    </div>
+                                    <h4 class="font-semibold text-gray-900">Alamat</h4>
+                                </div>
+                                <p class="text-sm text-gray-700 leading-relaxed">${data.form.address || 'Alamat belum diisi'}</p>
+                            </div>
+                            ` : ''}
 
                             <!-- Dokumen Upload Section -->
                             <div class="bg-white rounded-xl p-6 border border-gray-200 shadow-sm">

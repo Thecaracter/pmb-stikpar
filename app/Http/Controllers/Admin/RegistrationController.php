@@ -94,7 +94,7 @@ class RegistrationController extends Controller
     }
 
     /**
-     * Show the specified registration - FIXED untuk AJAX
+     * Show the specified registration - UPDATED untuk menampilkan semua field form
      */
     public function show($id)
     {
@@ -128,17 +128,50 @@ class RegistrationController extends Controller
                             'name' => $registration->path->name ?? '-',
                         ],
                         'form' => $registration->form ? [
+                            // Data dasar
                             'full_name' => $registration->form->full_name,
+                            'email' => $registration->form->email,
                             'phone_number' => $registration->form->phone_number,
-                            'birth_date' => $registration->form->birth_date,
+                            'birth_date' => $registration->form->birth_date ? $registration->form->birth_date->format('d M Y') : null,
                             'birth_place' => $registration->form->birth_place,
                             'gender' => $registration->form->gender,
                             'address' => $registration->form->address,
+
+                            // Data sekolah
+                            'school_origin' => $registration->form->school_origin,
+                            'nisn' => $registration->form->nisn,
+
+                            // Data agama & paroki
+                            'religion' => $registration->form->religion,
+                            'parish_name' => $registration->form->parish_name,
+
+                            // Data orang tua
+                            'parent_name' => $registration->form->parent_name,
+                            'parent_phone' => $registration->form->parent_phone,
+                            'parent_job' => $registration->form->parent_job,
+                            'parent_income' => $registration->form->parent_income,
+                            'mother_name' => $registration->form->mother_name,
+                            'mother_job' => $registration->form->mother_job,
+
+                            // Data prestasi (jika ada)
+                            'achievement_type' => $registration->form->achievement_type,
+                            'achievement_level' => $registration->form->achievement_level,
+                            'achievement_rank' => $registration->form->achievement_rank,
+                            'achievement_organizer' => $registration->form->achievement_organizer,
+                            'achievement_date' => $registration->form->achievement_date ? $registration->form->achievement_date->format('d M Y') : null,
+
+                            // Data nilai (untuk jalur prestasi)
+                            'grade_8_sem2' => $registration->form->grade_8_sem2,
+                            'grade_9_sem1' => $registration->form->grade_9_sem1,
+
+                            // Status form
+                            'is_completed' => $registration->form->is_completed,
+                            'completed_at' => $registration->form->completed_at ? $registration->form->completed_at->format('d M Y H:i') : null,
                         ] : null,
                         'admin_fee_paid' => $registration->admin_fee_paid,
-                        'payment_date' => $registration->payment_date,
-                        'document_submitted_at' => $registration->document_submitted_at,
-                        'passed_at' => $registration->passed_at,
+                        'payment_date' => $registration->payment_date ? $registration->payment_date->format('d M Y H:i') : null,
+                        'document_submitted_at' => $registration->document_submitted_at ? $registration->document_submitted_at->format('d M Y H:i') : null,
+                        'passed_at' => $registration->passed_at ? $registration->passed_at->format('d M Y H:i') : null,
                         'failure_reason' => $registration->failure_reason,
                         'created_at' => $registration->created_at->format('d M Y H:i'),
                         'updated_at' => $registration->updated_at->format('d M Y H:i'),
@@ -146,21 +179,15 @@ class RegistrationController extends Controller
                             return [
                                 'id' => $doc->id,
                                 'document_type' => $doc->document_type,
-                                'document_name' => $doc->document_name,
+                                'document_name' => $doc->document_name ?? $this->getDocumentDisplayName($doc->document_type),
                                 'file_name' => $doc->file_name,
                                 'file_path' => $doc->file_path,
-                                'file_size' => $doc->formatted_file_size,
+                                'file_size' => $this->formatFileSize($doc->file_size),
                                 'mime_type' => $doc->mime_type,
-                                'verification_status' => $doc->verification_status,
+                                'verification_status' => $doc->verification_status ?? 'pending',
                                 'verification_notes' => $doc->verification_notes,
                                 'uploaded_at' => $doc->created_at->format('d M Y H:i'),
-                                // Check if file starts with 'documents/' (from Storage::disk('public'))
-                                // or if it's already a full path like 'documents/...'
-                                'download_url' => str_starts_with($doc->file_path, 'documents/')
-                                    ? asset($doc->file_path)
-                                    : (str_starts_with($doc->file_path, 'storage/')
-                                        ? asset($doc->file_path)
-                                        : asset('storage/' . $doc->file_path)),
+                                'download_url' => $this->getDocumentDownloadUrl($doc->file_path),
                             ];
                         }),
                     ]
@@ -186,6 +213,63 @@ class RegistrationController extends Controller
 
             return redirect()->route('admin.registrations.index')
                 ->with('error', 'Data pendaftaran tidak ditemukan.');
+        }
+    }
+
+    /**
+     * Helper function to get document display name
+     */
+    private function getDocumentDisplayName($documentType)
+    {
+        $displayNames = [
+            'payment_proof' => 'Bukti Pembayaran',
+            'diploma' => 'Ijazah',
+            'family_card' => 'Kartu Keluarga',
+            'id_card' => 'KTP',
+            'photo' => 'Foto',
+            'kip_certificate' => 'Sertifikat KIP',
+            'poverty_certificate' => 'Surat Keterangan Tidak Mampu',
+            'report_card' => 'Rapor',
+            'achievement_certificate' => 'Sertifikat Prestasi',
+            'achievement_recommendation' => 'Surat Rekomendasi Prestasi',
+            'achievement_award' => 'Piagam Penghargaan',
+            'achievement_documentation' => 'Dokumentasi Prestasi',
+            'birth_certificate' => 'Akta Kelahiran',
+            'baptism_certificate' => 'Sertifikat Baptis',
+            'pastor_recommendation' => 'Surat Rekomendasi Pastor',
+            'marriage_certificate' => 'Akta Nikah Orang Tua',
+        ];
+
+        return $displayNames[$documentType] ?? ucfirst(str_replace('_', ' ', $documentType));
+    }
+
+    /**
+     * Helper function to format file size
+     */
+    private function formatFileSize($bytes)
+    {
+        if ($bytes >= 1048576) {
+            return number_format($bytes / 1048576, 2) . ' MB';
+        } elseif ($bytes >= 1024) {
+            return number_format($bytes / 1024, 2) . ' KB';
+        } else {
+            return $bytes . ' bytes';
+        }
+    }
+
+    /**
+     * Helper function to get document download URL
+     */
+    private function getDocumentDownloadUrl($filePath)
+    {
+        // Check if file starts with 'documents/' (from Storage::disk('public'))
+        // or if it's already a full path like 'documents/...'
+        if (str_starts_with($filePath, 'documents/')) {
+            return asset('storage/' . $filePath);
+        } elseif (str_starts_with($filePath, 'storage/')) {
+            return asset($filePath);
+        } else {
+            return asset('storage/' . $filePath);
         }
     }
 

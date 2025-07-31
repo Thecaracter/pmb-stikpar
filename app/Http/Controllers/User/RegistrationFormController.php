@@ -39,7 +39,7 @@ class RegistrationFormController extends Controller
             }
 
             // Check if user can fill form (payment must be verified)
-            if (!in_array($registration->status, ['waiting_documents', 'waiting_decision'])) {
+            if (!in_array($registration->status, ['waiting_documents', 'waiting_decision','waiting_payment'])) {
                 Log::warning('User trying to access registration form with invalid status', [
                     'user_id' => $user->id,
                     'registration_id' => $registration->id,
@@ -266,7 +266,7 @@ class RegistrationFormController extends Controller
     }
 
     /**
-     * Upload document - Updated to save directly to public folder with Windows compatibility
+     * Upload document - Updated for individual upload
      */
     public function uploadDocument(Request $request)
     {
@@ -403,11 +403,10 @@ class RegistrationFormController extends Controller
                 $existingDocument->delete();
             }
 
-            // Use copy method for better Windows compatibility
+            // Upload file
             $destinationPath = $uploadPath . '/' . $fileName;
-
-            // Method 1: Try to copy file content directly (most reliable)
             $fileContent = file_get_contents($file->getRealPath());
+
             if ($fileContent === false) {
                 throw new \Exception('Tidak dapat membaca file yang diupload');
             }
@@ -417,14 +416,12 @@ class RegistrationFormController extends Controller
                 throw new \Exception('Gagal menyimpan file ke direktori public');
             }
 
-            // Verify file was created successfully and has correct size
-            if (!file_exists($destinationPath)) {
-                throw new \Exception('File gagal tersimpan di direktori tujuan');
-            }
-
-            if (filesize($destinationPath) !== $file->getSize()) {
-                unlink($destinationPath); // Clean up invalid file
-                throw new \Exception('Ukuran file tidak sesuai setelah upload');
+            // Verify file was created successfully
+            if (!file_exists($destinationPath) || filesize($destinationPath) !== $file->getSize()) {
+                if (file_exists($destinationPath)) {
+                    unlink($destinationPath);
+                }
+                throw new \Exception('File gagal tersimpan dengan benar');
             }
 
             // Create new document record
@@ -433,14 +430,14 @@ class RegistrationFormController extends Controller
                 'document_type' => $documentType,
                 'document_name' => $requiredDocuments[$documentType]['name'],
                 'file_name' => $file->getClientOriginalName(),
-                'file_path' => $filePath, // Relative path from public folder
+                'file_path' => $filePath,
                 'mime_type' => $file->getMimeType(),
                 'file_size' => $file->getSize(),
                 'verification_status' => 'pending',
                 'is_required' => $requiredDocuments[$documentType]['required'] ?? true,
             ]);
 
-            // Update registration status if all required documents are uploaded
+            // Check document completion but don't force update status
             $this->checkDocumentCompletion($registration);
 
             DB::commit();
@@ -485,7 +482,7 @@ class RegistrationFormController extends Controller
     }
 
     /**
-     * Submit complete registration - FIXED to use waiting_decision
+     * Submit complete registration - Updated for flexible completion
      */
     public function submitRegistration(Request $request)
     {
@@ -525,7 +522,7 @@ class RegistrationFormController extends Controller
                 ], 400);
             }
 
-            // Check if all required documents are uploaded
+            // Check ONLY required documents (not optional ones like marriage certificate)
             $requiredDocuments = $this->getRequiredDocuments($registration->path->code);
             $uploadedDocuments = $registration->documentUploads->pluck('document_type')->toArray();
 
@@ -545,7 +542,7 @@ class RegistrationFormController extends Controller
 
                 return response()->json([
                     'success' => false,
-                    'message' => 'Dokumen berikut masih belum diupload: ' . implode(', ', $missingDocuments)
+                    'message' => 'Dokumen wajib berikut masih belum diupload: ' . implode(', ', $missingDocuments)
                 ], 400);
             }
 
@@ -557,7 +554,7 @@ class RegistrationFormController extends Controller
                 'completed_at' => now()
             ]);
 
-            // Update registration status to waiting_decision (FIXED)
+            // Update registration status to waiting_decision
             $registration->update([
                 'status' => 'waiting_decision',
                 'document_submitted_at' => now()
@@ -596,7 +593,7 @@ class RegistrationFormController extends Controller
     }
 
     /**
-     * Get required documents based on registration path
+     * Get required documents based on registration path - UPDATED
      */
     private function getRequiredDocuments($pathCode)
     {
@@ -646,9 +643,9 @@ class RegistrationFormController extends Controller
                 'description' => 'Surat rekomendasi dari pastor/pendeta gereja'
             ],
             'marriage_certificate' => [
-                'name' => 'Surat Nikah Orang Tua',
-                'required' => true,
-                'description' => 'Fotocopy surat nikah gereja orang tua'
+                'name' => 'Surat Nikah',
+                'required' => false, // FIXED: Optional since not all students are married
+                'description' => 'Fotocopy surat nikah (khusus yang sudah menikah)'
             ],
         ];
 
@@ -685,14 +682,15 @@ class RegistrationFormController extends Controller
         Log::debug('Required documents generated', [
             'path_code' => $pathCode,
             'document_count' => count($baseDocuments),
-            'document_types' => array_keys($baseDocuments)
+            'required_count' => count(array_filter($baseDocuments, fn($doc) => $doc['required'])),
+            'optional_count' => count(array_filter($baseDocuments, fn($doc) => !$doc['required']))
         ]);
 
         return $baseDocuments;
     }
 
     /**
-     * Check if all required documents are uploaded - FIXED to use waiting_decision
+     * Check if all required documents are uploaded - Updated to only check required docs
      */
     private function checkDocumentCompletion($registration)
     {
@@ -706,6 +704,7 @@ class RegistrationFormController extends Controller
         $allRequiredUploaded = true;
         $missingDocuments = [];
 
+        // Only check required documents
         foreach ($requiredDocuments as $docType => $docInfo) {
             if ($docInfo['required'] && !in_array($docType, $uploadedDocuments)) {
                 $allRequiredUploaded = false;
@@ -716,17 +715,12 @@ class RegistrationFormController extends Controller
         Log::info('Document completion check result', [
             'registration_id' => $registration->id,
             'all_required_uploaded' => $allRequiredUploaded,
-            'missing_documents' => $missingDocuments,
-            'form_completed' => $registration->form && $registration->form->is_completed
+            'missing_required_documents' => $missingDocuments,
+            'form_completed' => $registration->form && $registration->form->is_completed,
+            'uploaded_documents_count' => count($uploadedDocuments)
         ]);
 
-        // Update status to waiting_decision if all documents uploaded and form completed (FIXED)
-        if ($allRequiredUploaded && $registration->form && $registration->form->is_completed) {
-            $registration->update(['status' => 'waiting_decision']);
-
-            Log::info('Registration status updated to waiting_decision', [
-                'registration_id' => $registration->id
-            ]);
-        }
+        // Note: Don't automatically change status here, let user submit manually
+        // This gives more control over when the registration is finalized
     }
 }

@@ -221,107 +221,227 @@
     <!-- User Dashboard -->
     <div class="space-y-6">
         <!-- Welcome Header -->
-        <div class="bg-gradient-to-r from-blue-600 to-blue-700 rounded-lg p-6 text-white">
-            <h1 class="text-2xl font-bold">Selamat Datang, {{ auth()->user()->name }}!</h1>
-            <p class="text-blue-100 mt-2">Kelola proses pendaftaran mahasiswa baru Anda di sini</p>
+        <div class="bg-gradient-to-r from-blue-600 to-blue-700 rounded-lg p-4 sm:p-6 text-white">
+            <h1 class="text-xl sm:text-2xl font-bold">Selamat Datang, {{ auth()->user()->name }}!</h1>
+            <p class="text-blue-100 mt-2 text-sm sm:text-base">Kelola proses pendaftaran mahasiswa baru Anda di sini</p>
         </div>
 
-        <!-- Progress Steps -->
-        <div class="bg-white rounded-lg shadow-sm p-6">
-            <h2 class="text-lg font-semibold text-gray-900 mb-4">Status Pendaftaran</h2>
-            <div class="flex items-center justify-between">
-                <!-- Step 1 -->
-                <div class="flex flex-col items-center">
-                    <div class="w-10 h-10 {{ $progressSteps['account'] ? 'bg-green-500' : 'bg-gray-300' }} rounded-full flex items-center justify-center text-white font-bold text-sm">
-                        @if($progressSteps['account'])
-                            ✓
-                        @else
-                            1
-                        @endif
+        <!-- Progress Steps - Responsive Design -->
+        <div class="bg-white rounded-lg shadow-sm p-4 sm:p-6">
+            <h2 class="text-lg font-semibold text-gray-900 mb-6">Status Pendaftaran</h2>
+            
+            <!-- Desktop/Tablet Version (hidden on mobile) -->
+            <div class="hidden lg:block">
+                <div class="flex items-center justify-between">
+                    <!-- Step 1 -->
+                    <div class="flex flex-col items-center">
+                        <div class="w-12 h-12 {{ $progressSteps['account'] ? 'bg-green-500' : 'bg-gray-300' }} rounded-full flex items-center justify-center text-white font-bold text-sm">
+                            @if($progressSteps['account'])
+                                ✓
+                            @else
+                                1
+                            @endif
+                        </div>
+                        <span class="text-xs text-gray-600 mt-2 text-center">Registrasi<br>Akun</span>
                     </div>
-                    <span class="text-xs text-gray-600 mt-2 text-center">Registrasi<br>Akun</span>
+                    
+                    <!-- Connector -->
+                    <div class="flex-1 h-0.5 {{ $progressSteps['admin_fee'] ? 'bg-green-500' : 'bg-gray-300' }} mx-2"></div>
+                    
+                    <!-- Step 2 -->
+                    <div class="flex flex-col items-center">
+                        <div class="w-12 h-12 {{ $progressSteps['admin_fee'] ? 'bg-green-500' : ($progressSteps['upload_proof'] ? 'bg-blue-500' : 'bg-gray-300') }} rounded-full flex items-center justify-center text-white font-bold text-sm">
+                            @if($progressSteps['admin_fee'])
+                                ✓
+                            @else
+                                2
+                            @endif
+                        </div>
+                        <span class="text-xs text-gray-600 mt-2 text-center">Biaya<br>Administrasi</span>
+                    </div>
+                    
+                    <!-- Connector -->
+                    <div class="flex-1 h-0.5 {{ $progressSteps['fill_form'] ? 'bg-green-500' : 'bg-gray-300' }} mx-2"></div>
+                    
+                    <!-- Step 3 -->
+                    <div class="flex flex-col items-center">
+                        <div class="w-12 h-12 {{ $progressSteps['fill_form'] ? 'bg-green-500' : 'bg-gray-300' }} rounded-full flex items-center justify-center text-white font-bold text-sm">
+                            @if($progressSteps['fill_form'])
+                                ✓
+                            @else
+                                3
+                            @endif
+                        </div>
+                        <span class="text-xs text-gray-600 mt-2 text-center">Isi<br>Formulir</span>
+                    </div>
+                    
+                    <!-- Connector -->
+                    <div class="flex-1 h-0.5 {{ $progressSteps['upload_docs'] ? 'bg-green-500' : 'bg-gray-300' }} mx-2"></div>
+                    
+                    <!-- Step 4 -->
+                    <div class="flex flex-col items-center">
+                        <div class="w-12 h-12 {{ $progressSteps['upload_docs'] ? 'bg-green-500' : 'bg-gray-300' }} rounded-full flex items-center justify-center text-white font-bold text-sm">
+                            @if($progressSteps['upload_docs'])
+                                ✓
+                            @else
+                                4
+                            @endif
+                        </div>
+                        <span class="text-xs text-gray-600 mt-2 text-center">Upload<br>Dokumen</span>
+                    </div>
+                    
+                    <!-- Connector -->
+                    <div class="flex-1 h-0.5 {{ $progressSteps['waiting'] ? 'bg-green-500' : 'bg-gray-300' }} mx-2"></div>
+                    
+                    <!-- Step 5 -->
+                    <div class="flex flex-col items-center">
+                        <div class="w-12 h-12 {{ $progressSteps['waiting'] ? 'bg-green-500' : 'bg-gray-300' }} rounded-full flex items-center justify-center text-white font-bold text-sm">
+                            @if($progressSteps['waiting'])
+                                ✓
+                            @else
+                                5
+                            @endif
+                        </div>
+                        <span class="text-xs text-gray-600 mt-2 text-center">Menunggu<br>Kelulusan</span>
+                    </div>
                 </div>
-                
-                <!-- Connector -->
-                <div class="flex-1 h-0.5 {{ $progressSteps['admin_fee'] ? 'bg-green-500' : 'bg-gray-300' }} mx-2"></div>
-                
-                <!-- Step 2 -->
-                <div class="flex flex-col items-center">
-                    <div class="w-10 h-10 {{ $progressSteps['admin_fee'] ? 'bg-green-500' : ($progressSteps['account'] ? 'bg-blue-500' : 'bg-gray-300') }} rounded-full flex items-center justify-center text-white font-bold text-sm">
-                        @if($progressSteps['admin_fee'])
-                            ✓
-                        @else
-                            2
-                        @endif
+            </div>
+
+            <!-- Mobile/Tablet Version (clean vertical layout) -->
+            <div class="lg:hidden">
+                <div class="space-y-6">
+                    <!-- Step 1: Account Registration -->
+                    <div class="flex items-center space-x-4 p-4 bg-gradient-to-r from-green-50 to-green-100 rounded-xl border border-green-200">
+                        <div class="flex-shrink-0">
+                            <div class="w-12 h-12 bg-green-500 rounded-full flex items-center justify-center text-white font-bold">
+                                ✓
+                            </div>
+                        </div>
+                        <div class="flex-1">
+                            <h3 class="text-base font-semibold text-gray-900">Registrasi Akun</h3>
+                            <p class="text-sm text-green-600">Selesai • Akun berhasil dibuat</p>
+                        </div>
                     </div>
-                    <span class="text-xs text-gray-600 mt-2 text-center">Biaya<br>Administrasi</span>
-                </div>
-                
-                <!-- Connector -->
-                <div class="flex-1 h-0.5 {{ $progressSteps['upload_proof'] ? 'bg-green-500' : 'bg-gray-300' }} mx-2"></div>
-                
-                <!-- Step 3 -->
-                <div class="flex flex-col items-center">
-                    <div class="w-10 h-10 {{ $progressSteps['upload_proof'] ? 'bg-green-500' : 'bg-gray-300' }} rounded-full flex items-center justify-center text-white font-bold text-sm">
-                        @if($progressSteps['upload_proof'])
-                            ✓
-                        @else
-                            3
-                        @endif
+
+                    <!-- Step 2: Admin Fee -->
+                    <div class="flex items-center space-x-4 p-4 rounded-xl border {{ $progressSteps['admin_fee'] ? 'bg-gradient-to-r from-green-50 to-green-100 border-green-200' : ($progressSteps['upload_proof'] ? 'bg-gradient-to-r from-blue-50 to-blue-100 border-blue-200' : 'bg-gray-50 border-gray-200') }}">
+                        <div class="flex-shrink-0">
+                            <div class="w-12 h-12 {{ $progressSteps['admin_fee'] ? 'bg-green-500' : ($progressSteps['upload_proof'] ? 'bg-blue-500' : 'bg-gray-300') }} rounded-full flex items-center justify-center text-white font-bold {{ !$progressSteps['admin_fee'] && $progressSteps['upload_proof'] ? 'animate-pulse' : '' }}">
+                                @if($progressSteps['admin_fee'])
+                                    ✓
+                                @else
+                                    2
+                                @endif
+                            </div>
+                        </div>
+                        <div class="flex-1">
+                            <h3 class="text-base font-semibold text-gray-900">Biaya Administrasi</h3>
+                            <p class="text-sm {{ $progressSteps['admin_fee'] ? 'text-green-600' : ($progressSteps['upload_proof'] ? 'text-blue-600' : 'text-gray-400') }}">
+                                @if($progressSteps['admin_fee'])
+                                    Selesai • Pembayaran diverifikasi
+                                @elseif($progressSteps['upload_proof'])
+                                    Sedang Diproses • Menunggu verifikasi admin
+                                @else
+                                    Menunggu • Upload bukti pembayaran
+                                @endif
+                            </p>
+                        </div>
                     </div>
-                    <span class="text-xs text-gray-600 mt-2 text-center">Upload<br>Bukti</span>
-                </div>
-                
-                <!-- Connector -->
-                <div class="flex-1 h-0.5 {{ $progressSteps['fill_form'] ? 'bg-green-500' : 'bg-gray-300' }} mx-2"></div>
-                
-                <!-- Step 4 -->
-                <div class="flex flex-col items-center">
-                    <div class="w-10 h-10 {{ $progressSteps['fill_form'] ? 'bg-green-500' : 'bg-gray-300' }} rounded-full flex items-center justify-center text-white font-bold text-sm">
-                        @if($progressSteps['fill_form'])
-                            ✓
-                        @else
-                            4
-                        @endif
+
+                    <!-- Step 3: Fill Form -->
+                    @if($progressSteps['admin_fee'])
+                    <div class="flex items-center space-x-4 p-4 rounded-xl border {{ $progressSteps['fill_form'] ? 'bg-gradient-to-r from-green-50 to-green-100 border-green-200' : 'bg-gray-50 border-gray-200' }}">
+                        <div class="flex-shrink-0">
+                            <div class="w-12 h-12 {{ $progressSteps['fill_form'] ? 'bg-green-500' : 'bg-gray-300' }} rounded-full flex items-center justify-center text-white font-bold">
+                                @if($progressSteps['fill_form'])
+                                    ✓
+                                @else
+                                    3
+                                @endif
+                            </div>
+                        </div>
+                        <div class="flex-1">
+                            <h3 class="text-base font-semibold text-gray-900">Isi Formulir</h3>
+                            <p class="text-sm {{ $progressSteps['fill_form'] ? 'text-green-600' : 'text-gray-400' }}">
+                                {{ $progressSteps['fill_form'] ? 'Selesai • Formulir berhasil disimpan' : 'Menunggu • Lengkapi data pendaftaran' }}
+                            </p>
+                        </div>
                     </div>
-                    <span class="text-xs text-gray-600 mt-2 text-center">Isi<br>Formulir</span>
-                </div>
-                
-                <!-- Connector -->
-                <div class="flex-1 h-0.5 {{ $progressSteps['upload_docs'] ? 'bg-green-500' : 'bg-gray-300' }} mx-2"></div>
-                
-                <!-- Step 5 -->
-                <div class="flex flex-col items-center">
-                    <div class="w-10 h-10 {{ $progressSteps['upload_docs'] ? 'bg-green-500' : 'bg-gray-300' }} rounded-full flex items-center justify-center text-white font-bold text-sm">
-                        @if($progressSteps['upload_docs'])
-                            ✓
-                        @else
-                            5
-                        @endif
+                    @endif
+
+                    <!-- Step 4: Upload Documents -->
+                    @if($progressSteps['fill_form'])
+                    <div class="flex items-center space-x-4 p-4 rounded-xl border {{ $progressSteps['upload_docs'] ? 'bg-gradient-to-r from-green-50 to-green-100 border-green-200' : 'bg-gray-50 border-gray-200' }}">
+                        <div class="flex-shrink-0">
+                            <div class="w-12 h-12 {{ $progressSteps['upload_docs'] ? 'bg-green-500' : 'bg-gray-300' }} rounded-full flex items-center justify-center text-white font-bold">
+                                @if($progressSteps['upload_docs'])
+                                    ✓
+                                @else
+                                    4
+                                @endif
+                            </div>
+                        </div>
+                        <div class="flex-1">
+                            <h3 class="text-base font-semibold text-gray-900">Upload Dokumen</h3>
+                            <p class="text-sm {{ $progressSteps['upload_docs'] ? 'text-green-600' : 'text-gray-400' }}">
+                                {{ $progressSteps['upload_docs'] ? 'Selesai • Dokumen berhasil diupload' : 'Menunggu • Upload dokumen pendukung' }}
+                            </p>
+                        </div>
                     </div>
-                    <span class="text-xs text-gray-600 mt-2 text-center">Upload<br>Dokumen</span>
-                </div>
-                
-                <!-- Connector -->
-                <div class="flex-1 h-0.5 {{ $progressSteps['waiting'] ? 'bg-green-500' : 'bg-gray-300' }} mx-2"></div>
-                
-                <!-- Step 6 -->
-                <div class="flex flex-col items-center">
-                    <div class="w-10 h-10 {{ $progressSteps['waiting'] ? 'bg-green-500' : 'bg-gray-300' }} rounded-full flex items-center justify-center text-white font-bold text-sm">
-                        @if($progressSteps['waiting'])
-                            ✓
-                        @else
-                            6
-                        @endif
+                    @endif
+
+                    <!-- Step 5: Waiting for Decision -->
+                    @if($progressSteps['upload_docs'])
+                    <div class="flex items-center space-x-4 p-4 rounded-xl border {{ $progressSteps['waiting'] ? 'bg-gradient-to-r from-green-50 to-green-100 border-green-200' : 'bg-gradient-to-r from-orange-50 to-orange-100 border-orange-200' }}">
+                        <div class="flex-shrink-0">
+                            <div class="w-12 h-12 {{ $progressSteps['waiting'] ? 'bg-green-500' : 'bg-orange-500' }} rounded-full flex items-center justify-center text-white font-bold {{ !$progressSteps['waiting'] ? 'animate-pulse' : '' }}">
+                                @if($progressSteps['waiting'])
+                                    ✓
+                                @else
+                                    5
+                                @endif
+                            </div>
+                        </div>
+                        <div class="flex-1">
+                            <h3 class="text-base font-semibold text-gray-900">Menunggu Kelulusan</h3>
+                            <p class="text-sm {{ $progressSteps['waiting'] ? 'text-green-600' : 'text-orange-600' }}">
+                                @if($progressSteps['waiting'])
+                                    Selesai • Hasil seleksi sudah keluar
+                                @else
+                                    Sedang Diproses • Admin sedang review dokumen
+                                @endif
+                            </p>
+                        </div>
                     </div>
-                    <span class="text-xs text-gray-600 mt-2 text-center">Menunggu<br>Kelulusan</span>
+                    @endif
+
+                    <!-- Progress Summary -->
+                    <div class="mt-8 p-4 bg-blue-50 rounded-xl border border-blue-200">
+                        <div class="text-center">
+                            @php
+                                // Count only the main steps (exclude upload_proof which is just a substep)
+                                $completedSteps = 0;
+                                $totalSteps = 5;
+                                
+                                if ($progressSteps['account']) $completedSteps++;
+                                if ($progressSteps['admin_fee']) $completedSteps++;
+                                if ($progressSteps['fill_form']) $completedSteps++;
+                                if ($progressSteps['upload_docs']) $completedSteps++;
+                                if ($progressSteps['waiting']) $completedSteps++;
+                            @endphp
+                            <div class="text-2xl font-bold text-blue-600 mb-1">
+                                {{ $completedSteps }}/{{ $totalSteps }}
+                            </div>
+                            <p class="text-sm text-blue-700">Tahapan Selesai</p>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
 
         <!-- Registration Status Card -->
         @if($registration)
-        <div class="bg-white rounded-lg shadow-sm p-6">
+        <div class="bg-white rounded-lg shadow-sm p-4 sm:p-6">
             <h2 class="text-lg font-semibold text-gray-900 mb-4">Status Pendaftaran Anda</h2>
             <div class="bg-gradient-to-r {{ $registration->status === 'passed' ? 'from-green-50 to-green-100 border-green-200' : ($registration->status === 'failed' ? 'from-red-50 to-red-100 border-red-200' : 'from-blue-50 to-blue-100 border-blue-200') }} border rounded-lg p-4">
                 <div class="flex items-center space-x-3">
@@ -363,9 +483,9 @@
         @endif
 
         <!-- Quick Actions -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
             <!-- Payment Card -->
-            <div class="bg-white rounded-lg shadow-sm p-6 border-l-4 border-blue-500">
+            <div class="bg-white rounded-lg shadow-sm p-4 sm:p-6 border-l-4 border-blue-500">
                 <div class="flex items-center">
                     <div class="p-3 bg-blue-100 rounded-lg">
                         <svg class="h-6 w-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -385,7 +505,7 @@
             </div>
 
             <!-- Form Card -->
-            <div class="bg-white rounded-lg shadow-sm p-6 border-l-4 border-green-500">
+            <div class="bg-white rounded-lg shadow-sm p-4 sm:p-6 border-l-4 border-green-500">
                 <div class="flex items-center">
                     <div class="p-3 bg-green-100 rounded-lg">
                         <svg class="h-6 w-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -411,7 +531,7 @@
             </div>
 
             <!-- Documents Card -->
-            <div class="bg-white rounded-lg shadow-sm p-6 border-l-4 border-purple-500">
+            <div class="bg-white rounded-lg shadow-sm p-4 sm:p-6 border-l-4 border-purple-500">
                 <div class="flex items-center">
                     <div class="p-3 bg-purple-100 rounded-lg">
                         <svg class="h-6 w-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -438,7 +558,7 @@
         </div>
 
         <!-- Important Information -->
-        <div class="bg-white rounded-lg shadow-sm p-6">
+        <div class="bg-white rounded-lg shadow-sm p-4 sm:p-6">
             <h2 class="text-lg font-semibold text-gray-900 mb-4">Informasi Penting</h2>
             <div class="space-y-4">
                 <div class="flex items-start space-x-3">

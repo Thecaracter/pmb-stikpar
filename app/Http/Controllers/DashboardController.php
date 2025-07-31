@@ -94,24 +94,27 @@ class DashboardController extends Controller
             'waiting' => false,
         ];
 
-        // Check admin payment
-        if ($registration->adminPayment && $registration->adminPayment->verification_status === 'approved') {
-            $steps['admin_fee'] = true;
-            $steps['upload_proof'] = true;
+        // Step 2: Check admin payment - FIXED LOGIC
+        if ($registration->adminPayment) {
+            $steps['upload_proof'] = true; // User sudah upload bukti
+
+            if ($registration->adminPayment->verification_status === 'approved') {
+                $steps['admin_fee'] = true; // Pembayaran sudah diverifikasi
+            }
         }
 
-        // Check form completion
-        if ($registration->form && $registration->form->is_completed) {
+        // Step 3: Check form completion - hanya jika admin fee sudah approved
+        if ($steps['admin_fee'] && $registration->form && $registration->form->is_completed) {
             $steps['fill_form'] = true;
         }
 
-        // Check document upload
-        if ($registration->documentUploads()->count() > 0) {
+        // Step 4: Check document upload - hanya jika form sudah selesai
+        if ($steps['fill_form'] && $registration->documentUploads()->count() > 0) {
             $steps['upload_docs'] = true;
         }
 
-        // Check if waiting for decision
-        if (in_array($registration->status, ['waiting_decision', 'passed', 'failed'])) {
+        // Step 5: Check waiting status - FIXED: hanya jika semua step sebelumnya selesai DAN sedang dalam review/selesai
+        if ($steps['upload_docs'] && in_array($registration->status, ['document_review', 'waiting_decision', 'passed', 'failed', 'completed'])) {
             $steps['waiting'] = true;
         }
 
