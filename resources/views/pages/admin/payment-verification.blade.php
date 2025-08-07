@@ -898,36 +898,46 @@ function paymentVerification() {
         },
         
         // Export data
-        async exportData() {
-            try {
-                const paymentIds = this.filteredPayments.map(p => p.id);
-                
-                const form = document.createElement('form');
-                form.method = 'POST';
-                form.action = '/admin/api/payments/export';
-                
-                const csrfInput = document.createElement('input');
-                csrfInput.type = 'hidden';
-                csrfInput.name = '_token';
-                csrfInput.value = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-                
-                const dataInput = document.createElement('input');
-                dataInput.type = 'hidden';
-                dataInput.name = 'payment_ids';
-                dataInput.value = JSON.stringify(paymentIds);
-                
-                form.appendChild(csrfInput);
-                form.appendChild(dataInput);
-                document.body.appendChild(form);
-                form.submit();
-                document.body.removeChild(form);
-                
-                this.showNotification('Export dimulai...', 'success');
-            } catch (error) {
-                this.showNotification('Gagal export data', 'error');
-                console.error(error);
-            }
-        },
+        // Export data - FIXED
+async exportData() {
+    try {
+        const paymentIds = this.filteredPayments.map(p => p.id);
+        
+        // OPSI 1: Kirim sebagai JSON di body (recommended)
+        const response = await fetch('/admin/api/payments/export', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+            },
+            body: JSON.stringify({
+                payment_ids: paymentIds  // ← Array langsung, bukan string JSON
+            })
+        });
+
+        // Jika response adalah file stream
+        if (response.ok && response.headers.get('Content-Type').includes('text/csv')) {
+            const blob = await response.blob();
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `payments_${new Date().toISOString().slice(0, 10)}.csv`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
+            
+            this.showNotification('File berhasil didownload!', 'success');
+        } else {
+            // Jika response adalah JSON error
+            const result = await response.json();
+            this.showNotification(result.message || 'Gagal export data', 'error');
+        }
+    } catch (error) {
+        console.error('Export error:', error);
+        this.showNotification('Gagal export data', 'error');
+    }
+},
         
         // Helper methods
         getAvatarUrl(name) {
