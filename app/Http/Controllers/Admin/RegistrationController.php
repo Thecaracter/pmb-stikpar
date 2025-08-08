@@ -265,17 +265,17 @@ class RegistrationController extends Controller
      */
     private function getDocumentDownloadUrl($filePath)
     {
-        // Check if file starts with 'documents/' (from Storage::disk('public'))
-        // or if it's already a full path like 'documents/...'
-        if (str_starts_with($filePath, 'documents/')) {
-            return asset('storage/' . $filePath);
-        } elseif (str_starts_with($filePath, 'storage/')) {
-            return asset($filePath);
-        } else {
-            return asset('storage/' . $filePath);
+        // Handle null or empty file paths
+        if (empty($filePath)) {
+            return null;
         }
-    }
 
+        // Remove 'storage/' prefix if exists since files are directly accessible
+        $cleanPath = str_replace('storage/', '', $filePath);
+
+        // Return direct asset URL without storage prefix
+        return asset($cleanPath);
+    }
     /**
      * Update registration status
      */
